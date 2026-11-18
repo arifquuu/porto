@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="id" data-type="service" data-radius="sharp" data-buttons="solid" data-motion>
+<html lang="id" data-type="software" data-radius="sharp" data-buttons="solid" data-motion>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="site-kind" content="other">
-  <meta name="page-type" content="service">
+  <meta name="site-kind" content="software">
+  <meta name="page-type" content="software">
   <meta name="theme-color" content="#f4f1ea">
   <title>Portofolio M. Arifqu Wa Liin: Mahasiswa Sistem Informasi UNTAN</title>
   <meta name="description" content="Portofolio pribadi M. Arifqu Wa Liin, mahasiswa Program Studi Sistem Informasi Universitas Tanjungpura di Pontianak dengan tautan ke Instagram dan GitHub.">
@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
   <link rel="stylesheet" href="assets/layout/layout.css">
   <link rel="stylesheet" href="assets/icons/icon.css">
+  <link rel="stylesheet" href="assets/moments/line-carries-colour/moment.css">
   <link rel="stylesheet" href="assets/moments/word-highlight/moment.css">
   <style>
     :root {
@@ -1033,6 +1034,15 @@
       animation: ctaRingFlash 420ms ease-out both;
     }
 
+    .mo-lc {
+      --mo-gap: 24px;
+    }
+
+    .mo-lc[style*="--mo-below: 0.0px"] > .mo-lc__stage,
+    .mo-lc:not([style*="--mo-below"]) > .mo-lc__stage {
+      visibility: hidden;
+    }
+
     /* looping visuals inside the study simulator: one subject per cycle, paused off screen by motion.js */
     .study-panel__canvas[data-m-loop] {
       --m-cycle: 3.2s;
@@ -1215,7 +1225,7 @@
       </div>
     </section>
 
-    <section class="section ground-inverse" id="kuliah">
+    <section class="section ground-inverse" id="kuliah" data-moment="line-carries-colour" data-moment-opts='{"from":"base","start":0.18}'>
       <div class="wrap">
         <div class="grid split-grid">
           <div class="section__intro span-5">
@@ -1322,8 +1332,8 @@
                     <text x="428" y="170" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14">PK · id_titik</text>
                     <text x="428" y="198" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14">koordinat</text>
                   </g>
-                  <circle class="loop-dot loop-dot--a" cx="188" cy="175" r="4" fill="#f4f1ea" aria-hidden="true"/>
-                  <circle class="loop-dot loop-dot--b" cx="364" cy="175" r="4" fill="#f4f1ea" aria-hidden="true"/>
+                  <circle class="loop-dot loop-dot--a" cx="188" cy="175" r="4.5" fill="#f4f1ea" stroke="rgba(244,241,234,0.35)" stroke-width="4" aria-hidden="true"/>
+                  <circle class="loop-dot loop-dot--b" cx="364" cy="175" r="4.5" fill="#f4f1ea" stroke="rgba(244,241,234,0.35)" stroke-width="4" aria-hidden="true"/>
                 </svg>
               </div>
             </div>
@@ -1354,7 +1364,7 @@
                   <rect id="api-svg-res-box" class="api-res-box" x="412" y="120" width="144" height="110" rx="2" fill="rgba(244,241,234,0.16)" stroke="#f4f1ea" stroke-width="2"/>
                   <text x="430" y="166" fill="#f4f1ea" font-family="Red Hat Display, sans-serif" font-size="16" font-weight="500" id="api-svg-status">200 OK</text>
                   <text x="430" y="192" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14" id="api-svg-res">Data diizinkan</text>
-                  <circle class="loop-packet" cx="188" cy="175" r="5" fill="#f4f1ea" aria-hidden="true"/>
+                  <circle class="loop-packet" cx="188" cy="175" r="5" fill="#f4f1ea" stroke="rgba(244,241,234,0.35)" stroke-width="5" aria-hidden="true"/>
                 </svg>
               </div>
             </div>
@@ -1559,7 +1569,11 @@
             var target = document.getElementById(b.getAttribute('data-panel-target'));
             if (target) {
               target.hidden = !active;
-              if (active) pulseAnim(target);
+              if (active) {
+                pulseAnim(target);
+                pulseAnim(target.querySelector('.flow-beam'));
+                pulseAnim(target.querySelector('.api-res-box'));
+              }
             }
           });
         };
