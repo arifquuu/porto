@@ -135,6 +135,16 @@
       gap: var(--s-6);
     }
 
+    .nav__logo .mark {
+      transition: transform 180ms var(--ease);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .nav__logo:hover .mark {
+        transform: scale(1.06);
+      }
+    }
+
     @media (min-width: 1024px) {
       .nav__links {
         justify-content: flex-end;
@@ -824,7 +834,8 @@
         display: none;
       }
 
-      .study-panel__canvas {
+      .study-panel__canvas,
+      .study-panel__canvas[data-m-loop] {
         padding: var(--s-2);
       }
 
@@ -1022,11 +1033,109 @@
       animation: ctaRingFlash 420ms ease-out both;
     }
 
+    /* looping visuals inside the study simulator: one subject per cycle, paused off screen by motion.js */
+    .study-panel__canvas[data-m-loop] {
+      --m-cycle: 3.2s;
+      --m-still: 0.5;
+      position: relative;
+    }
+
+    #canvas-api {
+      --m-still: 0.8;
+    }
+
+    .loop-scan,
+    .loop-dot,
+    .loop-packet {
+      opacity: 0;
+      transform-box: view-box;
+    }
+
+    .loop-scan {
+      animation: loopScan var(--m-cycle) cubic-bezier(.65, 0, .35, 1) infinite;
+    }
+
+    .loop-cta {
+      animation: loopCta var(--m-cycle) linear infinite;
+    }
+
+    .loop-dot {
+      animation: loopDot var(--m-cycle) cubic-bezier(.2, .8, .2, 1) infinite;
+    }
+
+    .loop-dot--b {
+      animation-name: loopDotLate;
+    }
+
+    .loop-packet {
+      animation: loopPacketOk var(--m-cycle) linear infinite;
+    }
+
+    #canvas-api.is-denied .loop-packet {
+      animation-name: loopPacketDeny;
+    }
+
+    #canvas-api.is-denied .loop-gate {
+      animation: loopGateDeny var(--m-cycle) linear infinite;
+    }
+
+    @keyframes loopScan {
+      0% { transform: translateY(0); opacity: 0; }
+      8% { opacity: 0.8; }
+      78% { transform: translateY(276px); opacity: 0.8; }
+      86%, 100% { transform: translateY(276px); opacity: 0; }
+    }
+
+    @keyframes loopCta {
+      0%, 48% { opacity: 1; }
+      56% { opacity: 0.45; }
+      66%, 100% { opacity: 1; }
+    }
+
+    @keyframes loopDot {
+      0% { transform: translateX(0); opacity: 0; }
+      8% { opacity: 1; }
+      40% { transform: translateX(48px); opacity: 1; }
+      48%, 100% { transform: translateX(48px); opacity: 0; }
+    }
+
+    @keyframes loopDotLate {
+      0%, 44% { transform: translateX(0); opacity: 0; }
+      52% { opacity: 1; }
+      82% { transform: translateX(48px); opacity: 1; }
+      90%, 100% { transform: translateX(48px); opacity: 0; }
+    }
+
+    @keyframes loopPacketOk {
+      0% { transform: translateX(0); opacity: 0; }
+      5% { opacity: 1; }
+      26% { transform: translateX(46px); opacity: 1; }
+      30% { transform: translateX(46px); opacity: 0; }
+      56% { transform: translateX(178px); opacity: 0; }
+      60% { transform: translateX(178px); opacity: 1; }
+      82% { transform: translateX(224px); opacity: 1; }
+      88%, 100% { transform: translateX(224px); opacity: 0; }
+    }
+
+    @keyframes loopPacketDeny {
+      0% { transform: translateX(0); opacity: 0; }
+      5% { opacity: 1; }
+      26% { transform: translateX(46px); opacity: 1; }
+      34%, 100% { transform: translateX(46px); opacity: 0; }
+    }
+
+    @keyframes loopGateDeny {
+      0%, 24% { stroke-width: 1.25; }
+      32% { stroke-width: 3; }
+      44%, 100% { stroke-width: 1.25; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html {
         scroll-behavior: auto;
       }
 
+      .nav__logo .mark,
       .hero__media > img,
       .study-tab,
       .study-tab::after,
@@ -1147,7 +1256,7 @@
                 <span>Struktur: <strong id="web-readout-grid">2 kolom · 12 grid</strong></span>
                 <span>Batas baca: <strong id="web-readout-width">Maks 1360px</strong></span>
               </div>
-              <div class="study-panel__canvas">
+              <div class="study-panel__canvas" id="canvas-web" data-m-loop>
                 <svg id="svg-web" viewBox="0 0 600 350" width="600" height="350" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Ilustrasi tata letak halaman web responsif">
                   <path d="M40 36H560M40 175H560M40 314H560M120 20V330M300 20V330M480 20V330" stroke="rgba(244,241,234,0.16)" stroke-width="1"/>
                   <g id="web-wire-desktop" class="wire-group">
@@ -1155,7 +1264,7 @@
                     <rect x="40" y="96" width="248" height="218" rx="2" fill="rgba(244,241,234,0.06)" stroke="rgba(244,241,234,0.5)" stroke-width="1.25"/>
                     <rect x="64" y="132" width="168" height="16" rx="2" fill="#f4f1ea"/>
                     <rect x="64" y="166" width="192" height="10" rx="2" fill="rgba(244,241,234,0.5)"/>
-                    <rect x="64" y="226" width="96" height="30" rx="2" fill="#f4f1ea"/>
+                    <rect class="loop-cta" x="64" y="226" width="96" height="30" rx="2" fill="#f4f1ea"/>
                     <rect x="312" y="96" width="248" height="218" rx="2" fill="rgba(244,241,234,0.12)" stroke="#f4f1ea" stroke-width="1.5"/>
                     <circle cx="436" cy="205" r="46" fill="none" stroke="rgba(244,241,234,0.65)" stroke-width="1.5"/>
                     <circle cx="436" cy="205" r="5" fill="#f4f1ea"/>
@@ -1165,10 +1274,11 @@
                     <rect x="218" y="38" width="164" height="24" rx="2" fill="rgba(244,241,234,0.12)" stroke="rgba(244,241,234,0.45)" stroke-width="1"/>
                     <rect x="218" y="80" width="128" height="14" rx="2" fill="#f4f1ea"/>
                     <rect x="218" y="106" width="156" height="8" rx="2" fill="rgba(244,241,234,0.5)"/>
-                    <rect x="218" y="130" width="164" height="28" rx="2" fill="#f4f1ea"/>
+                    <rect class="loop-cta" x="218" y="130" width="164" height="28" rx="2" fill="#f4f1ea"/>
                     <rect x="218" y="176" width="164" height="134" rx="2" fill="rgba(244,241,234,0.12)" stroke="rgba(244,241,234,0.65)" stroke-width="1.25"/>
                     <circle cx="300" cy="243" r="5" fill="#f4f1ea"/>
                   </g>
+                  <rect class="loop-scan" x="40" y="36" width="520" height="2" fill="#f4f1ea" aria-hidden="true"/>
                 </svg>
               </div>
             </div>
@@ -1187,7 +1297,7 @@
                 <span>Entitas aktif: <strong id="db-readout-key">PK · nim</strong></span>
                 <span>Kardinalitas: <strong id="db-readout-rel">1:N ke Kuliah</strong></span>
               </div>
-              <div class="study-panel__canvas">
+              <div class="study-panel__canvas" id="canvas-db" data-m-loop>
                 <svg viewBox="0 0 600 350" width="600" height="350" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram relasi entitas mahasiswa, mata kuliah, dan pemetaan">
                   <path d="M188 175H236M364 175H412" stroke="rgba(244,241,234,0.35)" stroke-width="1.75"/>
                   <path id="db-flow-line" class="flow-beam" d="M188 175H236" stroke="#f4f1ea" stroke-width="2.5" stroke-dasharray="240" stroke-dashoffset="0"/>
@@ -1212,6 +1322,8 @@
                     <text x="428" y="170" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14">PK · id_titik</text>
                     <text x="428" y="198" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14">koordinat</text>
                   </g>
+                  <circle class="loop-dot loop-dot--a" cx="188" cy="175" r="4" fill="#f4f1ea" aria-hidden="true"/>
+                  <circle class="loop-dot loop-dot--b" cx="364" cy="175" r="4" fill="#f4f1ea" aria-hidden="true"/>
                 </svg>
               </div>
             </div>
@@ -1229,19 +1341,20 @@
                 <span>Rute: <strong id="api-readout-route">GET /api/catatan</strong></span>
                 <span>Respons JSON: <strong id="api-readout-json">200 · diizinkan</strong></span>
               </div>
-              <div class="study-panel__canvas">
+              <div class="study-panel__canvas" id="canvas-api" data-m-loop>
                 <svg viewBox="0 0 600 350" width="600" height="350" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram alur pengecekan request dan hak akses server">
                   <path d="M188 175H234M366 175H412" stroke="rgba(244,241,234,0.35)" stroke-width="1.75"/>
                   <path id="api-flow-beam" class="flow-beam" d="M188 175H234M366 175H412" stroke="#f4f1ea" stroke-width="2.5" stroke-dasharray="240" stroke-dashoffset="0"/>
                   <rect x="44" y="120" width="144" height="110" rx="2" fill="rgba(244,241,234,0.08)" stroke="rgba(244,241,234,0.55)" stroke-width="1.25"/>
                   <text x="64" y="166" fill="#f4f1ea" font-family="Red Hat Display, sans-serif" font-size="16" font-weight="500">Permintaan</text>
                   <text x="64" y="192" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14" id="api-svg-req">Peran: mahasiswa</text>
-                  <rect x="234" y="120" width="132" height="110" rx="2" fill="rgba(244,241,234,0.08)" stroke="rgba(244,241,234,0.55)" stroke-width="1.25"/>
+                  <rect id="api-gate" class="loop-gate" x="234" y="120" width="132" height="110" rx="2" fill="rgba(244,241,234,0.08)" stroke="rgba(244,241,234,0.55)" stroke-width="1.25"/>
                   <text x="252" y="166" fill="#f4f1ea" font-family="Red Hat Display, sans-serif" font-size="16" font-weight="500">Validasi</text>
                   <text x="252" y="192" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14">Cek izin rute</text>
                   <rect id="api-svg-res-box" class="api-res-box" x="412" y="120" width="144" height="110" rx="2" fill="rgba(244,241,234,0.16)" stroke="#f4f1ea" stroke-width="2"/>
                   <text x="430" y="166" fill="#f4f1ea" font-family="Red Hat Display, sans-serif" font-size="16" font-weight="500" id="api-svg-status">200 OK</text>
                   <text x="430" y="192" fill="#c8d2ec" font-family="Red Hat Text, sans-serif" font-size="14" id="api-svg-res">Data diizinkan</text>
+                  <circle class="loop-packet" cx="188" cy="175" r="5" fill="#f4f1ea" aria-hidden="true"/>
                 </svg>
               </div>
             </div>
@@ -1553,8 +1666,10 @@
       var apiNote = document.getElementById('api-panel-note');
       var apiJsonOut = document.getElementById('api-readout-json');
       var apiReadoutBar = document.querySelector('#panel-api .study-panel__readout');
+      var apiCanvas = document.getElementById('canvas-api');
       bindSwitchGroup('data-api-role', function (role) {
         var ok = role === 'mhs';
+        if (apiCanvas) apiCanvas.classList.toggle('is-denied', !ok);
         if (apiReq) apiReq.textContent = ok ? 'Peran: mahasiswa' : 'Peran: tamu';
         if (apiStatus) apiStatus.textContent = ok ? '200 OK' : '403 Ditolak';
         if (apiRes) apiRes.textContent = ok ? 'Data diizinkan' : 'Perlu login';
