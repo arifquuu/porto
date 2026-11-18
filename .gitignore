@@ -1,0 +1,12 @@
+# Local agent skills, design workflow state & internal specs
+.agent/
+.agents/
+.impeccable/
+.taste-skill/
+skills-lock.json
+PRODUCT.md
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+*.log
