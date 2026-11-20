@@ -258,6 +258,23 @@
       transition: background-color 220ms var(--ease), border-color 220ms var(--ease);
     }
 
+    .reading-progress {
+      position: absolute;
+      inset: auto 0 -1px;
+      height: 2px;
+      pointer-events: none;
+      background: var(--p-accent);
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) :is([data-scroll-scene="heading"], [data-scroll-scene="panel"]),
+      html:not([data-motion="off"]) [data-scroll-scene="sequence"] > * {
+        translate: var(--scroll-shift, none);
+      }
+    }
+
     header.nav.is-scrolled {
       background: color-mix(in oklab, var(--p-paper-hi) 92%, var(--p-surface));
       border-bottom-color: var(--line-strong);
@@ -724,7 +741,6 @@
       display: flex;
       flex-direction: column;
       gap: var(--s-5);
-      will-change: transform;
     }
 
     .kuliah-intro__head {
@@ -766,7 +782,6 @@
       border-radius: var(--r-md);
       font-family: var(--font-text);
       transition: background-color 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease), box-shadow 180ms var(--ease);
-      will-change: transform;
     }
 
     .study-tab:hover {
@@ -847,10 +862,6 @@
     }
 
     /* Modular 4-Plate Interactive Workbench */
-    .wb-stage {
-      will-change: transform;
-    }
-
     .wb-frame.frame {
       display: flex;
       flex-direction: column;
@@ -872,7 +883,6 @@
       border-radius: var(--r-md);
       background: #0e2049;
       box-shadow: 0 14px 32px -26px rgba(3, 8, 22, 0.85);
-      will-change: transform;
     }
 
     .wb__bar {
@@ -1522,7 +1532,6 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       width: 100%;
       gap: 10px;
-      will-change: transform;
     }
 
     .wb__stat {
@@ -1599,7 +1608,6 @@
     .gh-band {
       display: flex;
       flex-direction: column;
-      will-change: transform;
     }
 
     .gh-band--top {
@@ -1671,7 +1679,6 @@
     .stack-strip__item {
       display: flex;
       min-width: 0;
-      will-change: transform;
     }
 
     .stack-btn {
@@ -1803,7 +1810,6 @@
       box-shadow: 0 16px 34px -30px rgba(21, 44, 97, 0.28);
       text-align: left;
       overflow: hidden;
-      will-change: transform;
     }
 
     .stack-reader.frame > .stack-detail {
@@ -1830,7 +1836,6 @@
       color: var(--ink);
       max-width: 54ch;
       text-wrap: pretty;
-      will-change: transform;
     }
 
     .code-box {
@@ -1838,7 +1843,6 @@
       background: #10234d;
       border: 1px solid rgba(21, 44, 97, 0.25);
       overflow: hidden;
-      will-change: transform;
     }
 
     .example-view {
@@ -2992,9 +2996,7 @@
       .stack-strip .ic-tile img,
       .stack-detail__copy,
       .code-box,
-      [data-split],
-      [data-wb-part],
-      [data-stack-card] {
+      [data-scroll-scene] {
         transition: none !important;
         transform: none !important;
       }
@@ -3025,6 +3027,7 @@
 </head>
 <body>
   <header class="nav" data-nav>
+    <span class="reading-progress" aria-hidden="true"></span>
     <div class="wrap nav__bar">
       <a class="skip-link" href="#top">Lewati ke isi utama</a>
       <a class="nav__logo" href="#top" aria-label="Beranda M. Arifqu Wa Liin">
@@ -3074,7 +3077,7 @@
                 <a href="#tab-api"><span class="schema schema--api" aria-hidden="true">&gt;<i></i></span>Backend</a>
               </div>
             </nav>
-            <ul class="rows rows--spec hero__facts-list">
+            <ul class="rows rows--spec hero__facts-list" data-scroll-scene="sequence">
               <li>
                 <span class="rows__name">Kampus</span>
                 <span class="rows__value">UNTAN<span class="academic-sep" aria-hidden="true"> · </span><span class="academic-id">NIM h1101241058</span></span>
@@ -3085,7 +3088,7 @@
               </li>
             </ul>
           </div>
-          <div class="hero__media span-6 start-7" id="hero-portrait-frame">
+          <div class="hero__media span-6 start-7" data-scroll-scene="panel" id="hero-portrait-frame">
             <img src="assets/images/arifqu-portrait.jpg" width="676" height="892" alt="Potret M. Arifqu Wa Liin mengenakan kemeja batik indigo" fetchpriority="high" decoding="async">
           </div>
         </div>
@@ -3096,27 +3099,27 @@
       <div class="wrap" data-moment="cursor-spotlight" data-moment-opts='{"rest":[0.72,0.44],"radius":560,"grid":false}'>
         <div class="grid kuliah-grid">
           <div class="kuliah-intro span-5">
-            <div class="kuliah-intro__head" data-split="kuliah-head">
+            <div class="kuliah-intro__head" data-scroll-scene="heading">
               <p class="eyebrow eyebrow--sec"><span class="eyebrow__rule" aria-hidden="true"></span>Fokus Perkuliahan</p>
               <h2 id="kuliah-h">Studi di Sistem Informasi</h2>
               <p class="lead">Sebelum menulis kode, saya memetakan kebutuhan pengguna dan alur datanya.</p>
             </div>
-            <div class="study-tabs" role="group" aria-label="Pilih fokus belajar Sistem Informasi">
-              <button class="study-tab" type="button" id="tab-web" aria-pressed="true" aria-controls="panel-web" data-panel-target="panel-web" data-track-id="web" data-split="kuliah-tab-0">
+            <div class="study-tabs" data-scroll-scene="sequence" role="group" aria-label="Pilih fokus belajar Sistem Informasi">
+              <button class="study-tab" type="button" id="tab-web" aria-pressed="true" aria-controls="panel-web" data-panel-target="panel-web" data-track-id="web">
                 <span class="study-tab__left">
                   <span class="study-tab__num">01</span>
                   <span class="study-tab__title">Antarmuka web</span>
                 </span>
                 <span class="study-tab__meta">HTML · CSS · JS</span>
               </button>
-              <button class="study-tab" type="button" id="tab-db" aria-pressed="false" aria-controls="panel-db" data-panel-target="panel-db" data-track-id="db" data-split="kuliah-tab-1">
+              <button class="study-tab" type="button" id="tab-db" aria-pressed="false" aria-controls="panel-db" data-panel-target="panel-db" data-track-id="db">
                 <span class="study-tab__left">
                   <span class="study-tab__num">02</span>
                   <span class="study-tab__title">Basis data &amp; pemetaan</span>
                 </span>
                 <span class="study-tab__meta">SQL · NoSQL</span>
               </button>
-              <button class="study-tab" type="button" id="tab-api" aria-pressed="false" aria-controls="panel-api" data-panel-target="panel-api" data-track-id="api" data-split="kuliah-tab-2">
+              <button class="study-tab" type="button" id="tab-api" aria-pressed="false" aria-controls="panel-api" data-panel-target="panel-api" data-track-id="api">
                 <span class="study-tab__left">
                   <span class="study-tab__num">03</span>
                   <span class="study-tab__title">Dasar backend</span>
@@ -3124,7 +3127,7 @@
                 <span class="study-tab__meta">TypeScript · PHP</span>
               </button>
             </div>
-            <ul class="rows rows--spec kuliah-meta" data-split="kuliah-meta">
+            <ul class="rows rows--spec kuliah-meta">
               <li>
                 <span class="rows__name">Peminatan</span>
                 <span class="rows__value">Software Engineering (pemula)</span>
@@ -3136,9 +3139,9 @@
             </ul>
           </div>
 
-          <div class="wb-stage span-6 start-7" data-split="kuliah-right">
+          <div class="wb-stage span-6 start-7" data-scroll-scene="panel">
             <div class="wb-frame frame" data-ui data-visual aria-label="Ruang kerja simulasi studi Sistem Informasi">
-              <div class="wb__plate wb__bar" data-wb-part="bar">
+              <div class="wb__plate wb__bar">
                 <span class="wb__brand">
                   <span class="wb__brand-name">UNTAN</span>
                   <span class="wb__route-tag" id="wb-stage-tag">Tata letak · 12 grid</span>
@@ -3164,7 +3167,7 @@
                 </div>
               </div>
 
-              <div class="wb__plate wb__main" data-wb-part="main" data-ui-pause-host>
+              <div class="wb__plate wb__main" data-ui-pause-host>
                 <div class="study-panel" id="panel-web">
                   <div class="study-panel__canvas" id="canvas-web" data-mode="desktop" data-m-loop>
                     <div class="web-grid-guides" aria-hidden="true">
@@ -3296,41 +3299,41 @@
               </div>
 
               <div class="wb__metrics" aria-live="polite">
-                <div class="wb__plate wb__stat" data-insp-for="web" data-wb-part="metric-a">
+                <div class="wb__plate wb__stat" data-insp-for="web">
                   <span class="wb__insp-k">Struktur layar</span>
                   <strong class="wb__insp-v" id="web-readout-grid">2 kolom</strong>
                   <span class="wb__bar-track"><span class="wb__bar-fill" id="web-bar-a" style="--fill: 100%"></span></span>
                 </div>
-                <div class="wb__plate wb__stat" data-insp-for="web" data-wb-part="metric-b">
+                <div class="wb__plate wb__stat" data-insp-for="web">
                   <span class="wb__insp-k">Lebar simulasi</span>
                   <strong class="wb__insp-v" id="web-readout-width">1280 px</strong>
                   <span class="wb__bar-track"><span class="wb__bar-fill" id="web-bar-b" style="--fill: 100%"></span></span>
                 </div>
 
-                <div class="wb__plate wb__stat" data-insp-for="db" data-wb-part="metric-a" hidden>
+                <div class="wb__plate wb__stat" data-insp-for="db" hidden>
                   <span class="wb__insp-k">Entitas aktif</span>
                   <strong class="wb__insp-v" id="db-readout-key">PK · nim</strong>
                   <span class="wb__bar-track"><span class="wb__bar-fill" id="db-bar-a" style="--fill: 76%"></span></span>
                 </div>
-                <div class="wb__plate wb__stat" data-insp-for="db" data-wb-part="metric-b" hidden>
+                <div class="wb__plate wb__stat" data-insp-for="db" hidden>
                   <span class="wb__insp-k">Kardinalitas</span>
                   <strong class="wb__insp-v" id="db-readout-rel">1:N ke Kuliah</strong>
                   <span class="wb__bar-track"><span class="wb__bar-fill" id="db-bar-b" style="--fill: 62%"></span></span>
                 </div>
 
-                <div class="wb__plate wb__stat" data-insp-for="api" data-wb-part="metric-a" hidden>
+                <div class="wb__plate wb__stat" data-insp-for="api" hidden>
                   <span class="wb__insp-k">Rute server</span>
                   <strong class="wb__insp-v" id="api-readout-route">GET /api/catatan</strong>
                   <span class="wb__bar-track"><span class="wb__bar-fill" id="api-bar-a" style="--fill: 84%"></span></span>
                 </div>
-                <div class="wb__plate wb__stat" data-insp-for="api" data-wb-part="metric-b" hidden>
+                <div class="wb__plate wb__stat" data-insp-for="api" hidden>
                   <span class="wb__insp-k">Respons JSON</span>
                   <strong class="wb__insp-v" id="api-readout-json">200 · diizinkan</strong>
                   <span class="wb__bar-track"><span class="wb__bar-fill" id="api-bar-b" style="--fill: 90%"></span></span>
                 </div>
               </div>
 
-              <div class="wb__plate wb__note" data-wb-part="note" aria-live="polite">
+              <div class="wb__plate wb__note" aria-live="polite">
                 <p class="study-panel__note" id="web-panel-note" data-insp-for="web">Mulai 768 px, kedua panel berjajar. Geser lebar layar untuk mencoba batasnya.</p>
                 <p class="study-panel__note" id="db-panel-note" data-insp-for="db" hidden>Baris saya di tabel Mahasiswa memakai NIM h1101241058 sebagai kunci utama.</p>
                 <p class="study-panel__note" id="api-panel-note" data-insp-for="api" hidden>Status 200 OK: peran mahasiswa tervalidasi sehingga server mengirim data catatan belajar.</p>
@@ -3343,9 +3346,9 @@
 
     <section class="section statement" id="github" data-moment="word-highlight" data-moment-opts='{"from":0.94,"to":0.52}'>
       <div class="wrap gh-wrap">
-        <div class="gh-band gh-band--top" data-split="gh-top">
+        <div class="gh-band gh-band--top">
           <div class="gh-head grid">
-            <div class="gh-head__copy span-9">
+            <div class="gh-head__copy span-9" data-scroll-scene="heading">
               <p class="eyebrow eyebrow--sec"><span class="eyebrow__rule" aria-hidden="true"></span>Bahasa &amp; Perangkat</p>
               <h2>GitHub &amp; teknologi</h2>
               <p class="lead">Saya menyimpan latihan pemrograman saya di GitHub.</p>
@@ -3359,8 +3362,8 @@
         </div>
 
         <div class="gh-band gh-band--bottom">
-          <ul class="stack-strip" aria-label="Pilih bahasa untuk melihat catatan belajar">
-            <li class="stack-strip__item" data-stack-card="0">
+          <ul class="stack-strip" data-scroll-scene="sequence" aria-label="Pilih bahasa untuk melihat catatan belajar">
+            <li class="stack-strip__item">
               <button class="stack-btn" type="button" id="stack-html" aria-pressed="true" aria-controls="stack-info-html" data-panel-target="stack-info-html">
                 <span class="stack-btn__top">
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
@@ -3374,7 +3377,7 @@
                 </div>
               </button>
             </li>
-            <li class="stack-strip__item" data-stack-card="1">
+            <li class="stack-strip__item">
               <button class="stack-btn" type="button" id="stack-js" aria-pressed="false" aria-controls="stack-info-js" data-panel-target="stack-info-js">
                 <span class="stack-btn__top">
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
@@ -3388,7 +3391,7 @@
                 </div>
               </button>
             </li>
-            <li class="stack-strip__item" data-stack-card="2">
+            <li class="stack-strip__item">
               <button class="stack-btn" type="button" id="stack-ts" aria-pressed="false" aria-controls="stack-info-ts" data-panel-target="stack-info-ts">
                 <span class="stack-btn__top">
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
@@ -3402,7 +3405,7 @@
                 </div>
               </button>
             </li>
-            <li class="stack-strip__item" data-stack-card="3">
+            <li class="stack-strip__item">
               <button class="stack-btn" type="button" id="stack-php" aria-pressed="false" aria-controls="stack-info-php" data-panel-target="stack-info-php">
                 <span class="stack-btn__top">
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
@@ -3418,7 +3421,7 @@
             </li>
           </ul>
 
-          <div class="stack-reader frame" data-split="gh-reader" data-ui data-visual data-glow="edge-glow" data-fx-palette='{"bg":"#f4f1ea","surface":"#faf8f3","ink":"#191c22","muted":"#4a5160","accent":"#1d3f8a"}' data-glow-params='{"radius":4,"width":1.6,"glow":20,"bloom":0.44,"speed":280,"wash":0.2,"idle":0.2,"fill":1}'>
+          <div class="stack-reader frame" data-scroll-scene="panel" data-ui data-visual data-glow="edge-glow" data-fx-palette='{"bg":"#f4f1ea","surface":"#faf8f3","ink":"#191c22","muted":"#4a5160","accent":"#1d3f8a"}' data-glow-params='{"radius":4,"width":1.6,"glow":20,"bloom":0.44,"speed":280,"wash":0.2,"idle":0.2,"fill":1}'>
             <div class="stack-detail" id="stack-info-html">
               <div class="example-view">
                 <p class="stack-detail__copy">Geser batas antara dua bidang untuk melihat cara CSS Grid membagi 12 kolom.</p>
@@ -3494,7 +3497,7 @@
       <div class="closing__cta close--type">
         <div class="contact-head grid">
           <div class="contact-head__copy span-6">
-            <div class="contact-head__intro">
+            <div class="contact-head__intro" data-scroll-scene="heading">
               <p class="eyebrow eyebrow--sec"><span class="eyebrow__rule" aria-hidden="true"></span>Tautan Langsung</p>
               <h2>Kontak</h2>
               <p class="lead">Sapa saya lewat Instagram, atau pilih topik untuk mengisi subjek email.</p>
@@ -3508,7 +3511,7 @@
               </div>
             </div>
           </div>
-          <div class="mail-draft span-6 start-7">
+          <div class="mail-draft span-6 start-7" data-scroll-scene="panel">
             <dl>
               <div><dt>Kepada</dt><dd>arifqukeren@gmail.com</dd></div>
               <div><dt>Subjek</dt><dd id="mail-topic-preview" aria-live="polite">Halo Arifqu, salam kenal dari portofolio</dd></div>
@@ -3517,7 +3520,7 @@
           </div>
         </div>
 
-        <ul class="rows rows--spec rows--contact">
+        <ul class="rows rows--spec rows--contact" data-scroll-scene="sequence">
           <li>
             <span class="rows__name">Instagram</span>
             <span class="rows__value"><a class="link" href="https://www.instagram.com/arifquu/" target="_blank" rel="noopener noreferrer">@arifquu</a></span>
@@ -3747,205 +3750,103 @@
       var links = Array.prototype.slice.call(document.querySelectorAll('.nav__links .nav__link[href^="#"]'));
       var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
 
-      var kuliahSec = document.getElementById('kuliah');
-      var kuliahHead = document.querySelector('[data-split="kuliah-head"]');
-      var kuliahTabs = [0, 1, 2].map(function (i) { return document.querySelector('[data-split="kuliah-tab-' + i + '"]'); }).filter(Boolean);
-      var kuliahMeta = document.querySelector('[data-split="kuliah-meta"]');
-      var kuliahRight = document.querySelector('[data-split="kuliah-right"]');
-      var wbBar = document.querySelector('[data-wb-part="bar"]');
-      var wbMetricsA = Array.prototype.slice.call(document.querySelectorAll('[data-wb-part="metric-a"]'));
-      var wbMetricsB = Array.prototype.slice.call(document.querySelectorAll('[data-wb-part="metric-b"]'));
-      var wbNote = document.querySelector('[data-wb-part="note"]');
+      var progressLine = header.querySelector('.reading-progress');
+      var visibleScenes = new Map();
+      var motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+      var activeSection;
+      var pendingScrollFrame = 0;
 
-      var ghSec = document.getElementById('github');
-      var ghTop = document.querySelector('[data-split="gh-top"]');
-      var stackCards = [0, 1, 2, 3].map(function (i) { return document.querySelector('[data-stack-card="' + i + '"]'); }).filter(Boolean);
-      var ghReader = document.querySelector('[data-split="gh-reader"]');
-      var stackCopies = Array.prototype.slice.call(document.querySelectorAll('.stack-detail__copy'));
-      var stackCodes = Array.prototype.slice.call(document.querySelectorAll('.code-box'));
+      function updateReadingPosition() {
+        pendingScrollFrame = 0;
+        var maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var y = Math.min(maxY, Math.max(0, window.scrollY));
+        updateScrollScenes();
+        progressLine.style.transform = 'scaleX(' + (maxY ? y / maxY : 0) + ')';
+        header.classList.toggle('is-scrolled', y > 24);
 
-      var animNodes = [kuliahHead, kuliahMeta, kuliahRight, wbBar, wbNote, ghTop, ghReader]
-        .concat(kuliahTabs, wbMetricsA, wbMetricsB, stackCards, stackCopies, stackCodes)
-        .filter(Boolean);
-
-      var state = animNodes.map(function (el) {
-        return { el: el, cx: 0, cy: 0, cs: 1, tx: 0, ty: 0, ts: 1 };
-      });
-      var nodeMap = new Map();
-      state.forEach(function (s) { nodeMap.set(s.el, s); });
-
-      var setTarget = function (el, x, y, sc) {
-        var s = el ? nodeMap.get(el) : null;
-        if (!s) return;
-        s.tx = x;
-        s.ty = y;
-        s.ts = typeof sc === 'number' ? sc : 1;
-      };
-
-      var formatTransform = function (s) {
-        var hasPos = Math.abs(s.cx) > 0.05 || Math.abs(s.cy) > 0.05;
-        var hasScale = Math.abs(s.cs - 1) > 0.001;
-        if (!hasPos && !hasScale) return '';
-        var out = 'translate3d(' + (Math.round(s.cx * 10) / 10) + 'px,' + (Math.round(s.cy * 10) / 10) + 'px,0)';
-        if (hasScale) out += ' scale(' + (Math.round(s.cs * 1000) / 1000) + ')';
-        return out;
-      };
-
-      var applyInstant = function () {
-        state.forEach(function (s) {
-          s.cx = s.tx;
-          s.cy = s.ty;
-          s.cs = s.ts;
-          s.el.style.transform = formatTransform(s);
+        var readingLine = y + window.innerHeight * 0.4;
+        var current = targets[0];
+        targets.forEach(function (section) {
+          if (section.offsetTop <= readingLine) current = section;
         });
-      };
-
-      var rafId = 0;
-      var tickMotion = function () {
-        rafId = 0;
-        var moving = false;
-        state.forEach(function (s) {
-          var dx = s.tx - s.cx;
-          var dy = s.ty - s.cy;
-          var ds = s.ts - s.cs;
-          if (Math.abs(dx) < 0.2 && Math.abs(dy) < 0.2 && Math.abs(ds) < 0.0008) {
-            s.cx = s.tx;
-            s.cy = s.ty;
-            s.cs = s.ts;
-          } else {
-            s.cx += dx * 0.26;
-            s.cy += dy * 0.26;
-            s.cs += ds * 0.26;
-            moving = true;
-          }
-          s.el.style.transform = formatTransform(s);
+        if (y >= maxY - 1 && maxY > 0) current = targets[targets.length - 1];
+        if (current === activeSection) return;
+        activeSection = current;
+        links.forEach(function (link) {
+          if (link.hash === '#' + current.id) link.setAttribute('aria-current', 'page');
+          else link.removeAttribute('aria-current');
         });
-        if (moving) rafId = requestAnimationFrame(tickMotion);
-      };
+      }
 
-      var easeOutPart = function (t) {
-        var inv = 1 - t;
-        return 1 - inv * inv;
-      };
+      function scheduleReadingPosition() {
+        if (!pendingScrollFrame) pendingScrollFrame = requestAnimationFrame(updateReadingPosition);
+      }
+      window.addEventListener('scroll', scheduleReadingPosition, { passive: true });
+      window.addEventListener('resize', scheduleReadingPosition);
+      if ('ResizeObserver' in window) new ResizeObserver(scheduleReadingPosition).observe(document.body);
+      updateReadingPosition();
 
-      var tabFanX = [-44, -70, -96];
-      var tabFanY = [-8, 0, 10];
-      var cardArcX = [-66, -22, 22, 66];
+      function clearScene(scene) {
+        scene.items.forEach(function (item) { item.style.removeProperty('--scroll-shift'); });
+        scene.groupShift = 0;
+      }
 
-      var updateScrollSplit = function (instant) {
+      function updateScrollScenes() {
         if (isReduced()) {
-          state.forEach(function (s) { s.tx = 0; s.ty = 0; s.ts = 1; s.cx = 0; s.cy = 0; s.cs = 1; s.el.style.transform = ''; });
-          if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+          visibleScenes.forEach(clearScene);
           return;
         }
-        var sy = window.scrollY || window.pageYOffset || 0;
-        var vh = window.innerHeight || 900;
-        var vw = window.innerWidth || 1440;
-        var maxScroll = Math.max(0, document.documentElement.scrollHeight - vh);
-        var atEdge = sy <= 4 || sy >= maxScroll - 4;
-        var scale = vw >= 1200 ? 1 : vw >= 1024 ? 0.66 : vw >= 640 ? 0.42 : 0.22;
+        var viewport = window.innerHeight;
+        var band = Math.min(180, viewport * 0.23);
+        var step = Math.min(24, band * 0.16);
+        var headerHeight = header.offsetHeight;
+        var travel = window.innerWidth < 640 ? 21 : 34;
 
-        if (kuliahSec) {
-          var rk = kuliahSec.getBoundingClientRect();
-          var uk = rk.top / vh;
-          var absK = Math.abs(uk);
-          if (atEdge || absK <= 0.025 || absK >= 1.12) {
-            setTarget(kuliahHead, 0, 0, 1);
-            kuliahTabs.forEach(function (el) { setTarget(el, 0, 0, 1); });
-            setTarget(kuliahMeta, 0, 0, 1);
-            setTarget(kuliahRight, 0, 0, 1);
-            setTarget(wbBar, 0, 0, 1);
-            wbMetricsA.forEach(function (el) { setTarget(el, 0, 0, 1); });
-            wbMetricsB.forEach(function (el) { setTarget(el, 0, 0, 1); });
-            setTarget(wbNote, 0, 0, 1);
-          } else {
-            var signK = uk < 0 ? -1 : 1;
-            var magK = easeOutPart(Math.min(1, (absK - 0.025) / 0.54));
-            if (vw >= 1024) {
-              setTarget(kuliahHead, -magK * 64 * scale, -magK * 18 * scale * signK, 1 - magK * 0.02 * scale);
-              kuliahTabs.forEach(function (el, i) {
-                setTarget(el, magK * tabFanX[i] * scale, magK * tabFanY[i] * scale * signK, 1 - magK * 0.015 * scale);
-              });
-              setTarget(kuliahMeta, -magK * 56 * scale, magK * 18 * scale * signK, 1);
-              setTarget(kuliahRight, magK * 66 * scale, magK * 22 * scale * signK, 1 - magK * 0.024 * scale);
-              setTarget(wbBar, 0, -magK * 24 * scale, 1);
-              wbMetricsA.forEach(function (el) { setTarget(el, 0, magK * 18 * scale, 1); });
-              wbMetricsB.forEach(function (el) { setTarget(el, 0, magK * 18 * scale, 1); });
-              setTarget(wbNote, 0, magK * 36 * scale, 1);
-            } else {
-              setTarget(kuliahHead, -magK * 24 * scale, -magK * 12 * scale, 1 - magK * 0.012 * scale);
-              kuliahTabs.forEach(function (el, i) {
-                setTarget(el, (i - 1) * magK * 18 * scale, magK * 6 * scale, 1);
-              });
-              setTarget(kuliahMeta, 0, 0, 1);
-              setTarget(kuliahRight, magK * 22 * scale, magK * 12 * scale, 1 - magK * 0.014 * scale);
-              setTarget(wbBar, 0, -magK * 10 * scale, 1);
-              wbMetricsA.forEach(function (el) { setTarget(el, 0, magK * 10 * scale, 1); });
-              wbMetricsB.forEach(function (el) { setTarget(el, 0, magK * 10 * scale, 1); });
-              setTarget(wbNote, 0, magK * 16 * scale, 1);
-            }
+        // Read every natural position before moving anything. The middle of the screen stays still.
+        visibleScenes.forEach(function (scene, group) {
+          var rect = group.getBoundingClientRect();
+          scene.top = rect.top - scene.groupShift;
+          scene.bottom = scene.top + rect.height;
+        });
+        visibleScenes.forEach(function (scene, group) {
+          if (group.contains(document.activeElement)) {
+            clearScene(scene);
+            return;
           }
-        }
-
-        if (ghSec) {
-          var rg = ghSec.getBoundingClientRect();
-          var ug = rg.top / vh;
-          var absG = Math.abs(ug);
-          if (atEdge || absG <= 0.025 || absG >= 1.12) {
-            setTarget(ghTop, 0, 0, 1);
-            stackCards.forEach(function (el) { setTarget(el, 0, 0, 1); });
-            setTarget(ghReader, 0, 0, 1);
-            stackCopies.forEach(function (el) { setTarget(el, 0, 0, 1); });
-            stackCodes.forEach(function (el) { setTarget(el, 0, 0, 1); });
-          } else {
-            var magG = easeOutPart(Math.min(1, (absG - 0.025) / 0.54));
-            if (vw >= 1024) {
-              setTarget(ghTop, -magG * 56 * scale, -magG * 22 * scale, 1 - magG * 0.018 * scale);
-              stackCards.forEach(function (el, i) {
-                setTarget(el, magG * cardArcX[i] * scale, magG * 22 * scale, 1 - magG * 0.02 * scale);
-              });
-              setTarget(ghReader, 0, magG * 42 * scale, 1 - magG * 0.016 * scale);
-              stackCopies.forEach(function (el) { setTarget(el, -magG * 24 * scale, 0, 1); });
-              stackCodes.forEach(function (el) { setTarget(el, magG * 24 * scale, 0, 1); });
-            } else {
-              setTarget(ghTop, -magG * 20 * scale, -magG * 14 * scale, 1 - magG * 0.012 * scale);
-              stackCards.forEach(function (el, i) {
-                var colSign = i % 2 === 0 ? -1 : 1;
-                var rowY = i < 2 ? 12 : 24;
-                setTarget(el, colSign * magG * 24 * scale, magG * rowY * scale, 1 - magG * 0.012 * scale);
-              });
-              setTarget(ghReader, 0, magG * 24 * scale, 1);
-              stackCopies.forEach(function (el) { setTarget(el, -magG * 10 * scale, 0, 1); });
-              stackCodes.forEach(function (el) { setTarget(el, magG * 10 * scale, 0, 1); });
-            }
-          }
-        }
-
-        if (instant === true) {
-          if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
-          applyInstant();
-        } else if (!rafId) {
-          rafId = requestAnimationFrame(tickMotion);
-        }
-      };
-
-      if (links.length && targets.length) {
-        var updateNav = function (instant) {
-          if (header) header.classList.toggle('is-scrolled', window.scrollY > 24);
-          var mid = window.scrollY + window.innerHeight * 0.4;
-          var active = '';
-          targets.forEach(function (sec) {
-            if (sec.offsetTop <= mid && sec.offsetTop + sec.offsetHeight > mid) active = sec.id;
+          scene.items.forEach(function (item, index) {
+            var reverseIndex = scene.items.length - 1 - index;
+            var lower = Math.min(1, Math.max(0, (scene.top - viewport + band + index * step) / band));
+            var upper = Math.min(1, Math.max(0, (headerHeight + band + reverseIndex * step - scene.bottom) / band));
+            var shift = Math.round(travel * (lower * lower - upper * upper) * 10) / 10;
+            if (item === group) scene.groupShift = shift;
+            if (shift) item.style.setProperty('--scroll-shift', '0 ' + shift + 'px');
+            else item.style.removeProperty('--scroll-shift');
           });
-          links.forEach(function (a) {
-            if (active && a.getAttribute('href') === '#' + active) a.setAttribute('aria-current', 'page');
-            else a.removeAttribute('aria-current');
+        });
+      }
+
+      if ('IntersectionObserver' in window) {
+        var sceneObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            entry.target.querySelectorAll('[data-scroll-scene]').forEach(function (group) {
+              if (entry.isIntersecting) {
+                var items = group.dataset.scrollScene === 'sequence' ? Array.from(group.children) : [group];
+                visibleScenes.set(group, { items: items, groupShift: 0 });
+              } else if (visibleScenes.has(group)) {
+                clearScene(visibleScenes.get(group));
+                visibleScenes.delete(group);
+              }
+            });
           });
-          updateScrollSplit(instant === true);
-        };
-        window.addEventListener('scroll', function () { updateNav(false); }, { passive: true });
-        window.addEventListener('resize', function () { updateScrollSplit(true); }, { passive: true });
-        updateNav(true);
+          scheduleReadingPosition();
+        }, { rootMargin: '64px 0px' });
+        targets.forEach(function (section) { sceneObserver.observe(section); });
+        motionPreference.addEventListener('change', scheduleReadingPosition);
+        new MutationObserver(scheduleReadingPosition).observe(document.documentElement, {
+          attributes: true, attributeFilter: ['data-motion']
+        });
+        document.addEventListener('focusin', scheduleReadingPosition);
+        document.addEventListener('focusout', scheduleReadingPosition);
       }
 
       var stageTag = document.getElementById('wb-stage-tag');
