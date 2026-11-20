@@ -269,9 +269,29 @@
     }
 
     @media (prefers-reduced-motion: no-preference) {
-      html:not([data-motion="off"]) :is([data-scroll-scene="heading"], [data-scroll-scene="panel"]),
+      html:not([data-motion="off"]) #hero-portrait-frame > img {
+        scale: var(--portrait-zoom, 1);
+        transition-property: transform, filter;
+      }
+      [data-scroll-scene="heading"] h2 { position: relative; }
+      html:not([data-motion="off"]) [data-scroll-scene="heading"] h2::after {
+        content: "";
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 1.8em;
+        height: 2px;
+        background: currentColor;
+        opacity: .58;
+        transform: scaleX(calc(1 - var(--scroll-edge, 0)));
+        transform-origin: left;
+      }
       html:not([data-motion="off"]) [data-scroll-scene="sequence"] > * {
-        translate: var(--scroll-shift, none);
+        translate: 0 calc(var(--scroll-phase, 0) * 28px);
+      }
+      html:not([data-motion="off"]) .stack-strip[data-scroll-scene] > li {
+        translate: 0 calc(var(--scroll-phase, 0) * clamp(78px, 10vh, 104px));
+        scale: calc(1 - var(--scroll-edge, 0) * .16);
       }
     }
 
@@ -3077,7 +3097,7 @@
                 <a href="#tab-api"><span class="schema schema--api" aria-hidden="true">&gt;<i></i></span>Backend</a>
               </div>
             </nav>
-            <ul class="rows rows--spec hero__facts-list" data-scroll-scene="sequence">
+            <ul class="rows rows--spec hero__facts-list">
               <li>
                 <span class="rows__name">Kampus</span>
                 <span class="rows__value">UNTAN<span class="academic-sep" aria-hidden="true"> · </span><span class="academic-id">NIM h1101241058</span></span>
@@ -3088,7 +3108,7 @@
               </li>
             </ul>
           </div>
-          <div class="hero__media span-6 start-7" data-scroll-scene="panel" id="hero-portrait-frame">
+          <div class="hero__media span-6 start-7" id="hero-portrait-frame">
             <img src="assets/images/arifqu-portrait.jpg" width="676" height="892" alt="Potret M. Arifqu Wa Liin mengenakan kemeja batik indigo" fetchpriority="high" decoding="async">
           </div>
         </div>
@@ -3139,7 +3159,7 @@
             </ul>
           </div>
 
-          <div class="wb-stage span-6 start-7" data-scroll-scene="panel">
+          <div class="wb-stage span-6 start-7">
             <div class="wb-frame frame" data-ui data-visual aria-label="Ruang kerja simulasi studi Sistem Informasi">
               <div class="wb__plate wb__bar">
                 <span class="wb__brand">
@@ -3421,7 +3441,7 @@
             </li>
           </ul>
 
-          <div class="stack-reader frame" data-scroll-scene="panel" data-ui data-visual data-glow="edge-glow" data-fx-palette='{"bg":"#f4f1ea","surface":"#faf8f3","ink":"#191c22","muted":"#4a5160","accent":"#1d3f8a"}' data-glow-params='{"radius":4,"width":1.6,"glow":20,"bloom":0.44,"speed":280,"wash":0.2,"idle":0.2,"fill":1}'>
+          <div class="stack-reader frame" data-ui data-visual data-glow="edge-glow" data-fx-palette='{"bg":"#f4f1ea","surface":"#faf8f3","ink":"#191c22","muted":"#4a5160","accent":"#1d3f8a"}' data-glow-params='{"radius":4,"width":1.6,"glow":20,"bloom":0.44,"speed":280,"wash":0.2,"idle":0.2,"fill":1}'>
             <div class="stack-detail" id="stack-info-html">
               <div class="example-view">
                 <p class="stack-detail__copy">Geser batas antara dua bidang untuk melihat cara CSS Grid membagi 12 kolom.</p>
@@ -3511,7 +3531,7 @@
               </div>
             </div>
           </div>
-          <div class="mail-draft span-6 start-7" data-scroll-scene="panel">
+          <div class="mail-draft span-6 start-7">
             <dl>
               <div><dt>Kepada</dt><dd>arifqukeren@gmail.com</dd></div>
               <div><dt>Subjek</dt><dd id="mail-topic-preview" aria-live="polite">Halo Arifqu, salam kenal dari portofolio</dd></div>
@@ -3760,7 +3780,7 @@
         pendingScrollFrame = 0;
         var maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
         var y = Math.min(maxY, Math.max(0, window.scrollY));
-        updateScrollScenes();
+        updateScrollScenes(y);
         progressLine.style.transform = 'scaleX(' + (maxY ? y / maxY : 0) + ')';
         header.classList.toggle('is-scrolled', y > 24);
 
@@ -3787,26 +3807,35 @@
       updateReadingPosition();
 
       function clearScene(scene) {
-        scene.items.forEach(function (item) { item.style.removeProperty('--scroll-shift'); });
-        scene.groupShift = 0;
+        scene.items.forEach(function (item) {
+          item.style.removeProperty('--scroll-phase');
+          item.style.removeProperty('--scroll-edge');
+        });
       }
 
-      function updateScrollScenes() {
+      function smoothFraction(value) {
+        var t = Math.min(1, Math.max(0, value));
+        return t * t * (3 - 2 * t);
+      }
+
+      function updateScrollScenes(y) {
         if (isReduced()) {
+          portraitFrame.style.removeProperty('--portrait-zoom');
           visibleScenes.forEach(clearScene);
           return;
         }
         var viewport = window.innerHeight;
-        var band = Math.min(180, viewport * 0.23);
-        var step = Math.min(24, band * 0.16);
+        var zoom = 1 + .24 * Math.min(1, y / (viewport * .52));
+        portraitFrame.style.setProperty('--portrait-zoom', zoom.toFixed(4));
+        var band = Math.min(480, viewport * .54);
+        var step = Math.min(32, band * .08);
         var headerHeight = header.offsetHeight;
-        var travel = window.innerWidth < 640 ? 21 : 34;
 
-        // Read every natural position before moving anything. The middle of the screen stays still.
+        // Measure the stationary groups before moving their contents.
         visibleScenes.forEach(function (scene, group) {
           var rect = group.getBoundingClientRect();
-          scene.top = rect.top - scene.groupShift;
-          scene.bottom = scene.top + rect.height;
+          scene.top = rect.top;
+          scene.bottom = rect.bottom;
         });
         visibleScenes.forEach(function (scene, group) {
           if (group.contains(document.activeElement)) {
@@ -3815,12 +3844,11 @@
           }
           scene.items.forEach(function (item, index) {
             var reverseIndex = scene.items.length - 1 - index;
-            var lower = Math.min(1, Math.max(0, (scene.top - viewport + band + index * step) / band));
-            var upper = Math.min(1, Math.max(0, (headerHeight + band + reverseIndex * step - scene.bottom) / band));
-            var shift = Math.round(travel * (lower * lower - upper * upper) * 10) / 10;
-            if (item === group) scene.groupShift = shift;
-            if (shift) item.style.setProperty('--scroll-shift', '0 ' + shift + 'px');
-            else item.style.removeProperty('--scroll-shift');
+            var lower = smoothFraction((scene.top - viewport + band + index * step) / band);
+            var upper = smoothFraction((headerHeight + band + reverseIndex * step - scene.bottom) / band);
+            var phase = lower - upper;
+            item.style.setProperty('--scroll-phase', phase.toFixed(4));
+            item.style.setProperty('--scroll-edge', Math.abs(phase).toFixed(4));
           });
         });
       }
@@ -3831,7 +3859,7 @@
             entry.target.querySelectorAll('[data-scroll-scene]').forEach(function (group) {
               if (entry.isIntersecting) {
                 var items = group.dataset.scrollScene === 'sequence' ? Array.from(group.children) : [group];
-                visibleScenes.set(group, { items: items, groupShift: 0 });
+                visibleScenes.set(group, { items: items });
               } else if (visibleScenes.has(group)) {
                 clearScene(visibleScenes.get(group));
                 visibleScenes.delete(group);
