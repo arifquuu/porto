@@ -20,7 +20,18 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://porto-arifqu.vercel.app/share.jpg">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <script>(function(){try{if(localStorage.getItem('arifqu-theme')==='dark'){var d=document.documentElement;d.setAttribute('data-theme','dark');d.dataset.tone='dark';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#0c1836');}}catch(e){}})()</script>
+  <script>
+    (function () {
+      var preference;
+      try { preference = localStorage.getItem('arifqu-theme'); } catch {}
+      var dark = preference === 'dark' || (preference !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) {
+        document.documentElement.dataset.theme = 'dark';
+        document.documentElement.dataset.tone = 'dark';
+        document.querySelector('meta[name="theme-color"]').content = '#0c1836';
+      }
+    })();
+  </script>
   <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
   <script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
   <link rel="modulepreload" href="assets/moments/moments.js">
@@ -76,7 +87,6 @@
       scrollbar-color: var(--muted) transparent;
     }
 
-    /* Curated Midnight-Indigo Theme ("Indigo Malam") & Circular Iris View Transition */
     html[data-theme="dark"] {
       --p-bg: #0c1836;
       --p-surface: #12234b;
@@ -234,7 +244,11 @@
     }
 
     /* Navigation */
-    .stack-btn { scroll-margin-top: calc(var(--nav) + 20px); }
+    .stack-btn, .study-tab { scroll-margin-top: calc(var(--nav) + 20px); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html.following-anchor:not([data-motion="off"]) { scroll-behavior: smooth; }
+    }
 
     :is(#kuliah, #github, #kontak) {
       padding-block-start: max(var(--padt), calc(var(--nav) + var(--s-4)));
@@ -271,8 +285,8 @@
       position: relative;
       display: inline-grid;
       place-items: center;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       padding: 0;
       border-radius: var(--r-btn);
       border: 1px solid var(--line-strong);
@@ -410,6 +424,106 @@
       flex-direction: column;
       gap: var(--s-4);
     }
+
+    .study-map {
+      width: min(100%, 390px);
+      color: var(--p-accent);
+    }
+
+    .study-map p {
+      margin: 0 0 10px;
+      color: var(--p-muted);
+      font: 14px/1.5 var(--font-text);
+    }
+
+    .study-map__links {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .study-map__links a {
+      display: grid;
+      justify-items: start;
+      gap: 7px;
+      position: relative;
+      padding-block: 2px;
+      color: inherit;
+      font: 600 15px/1.4 var(--font-text);
+      text-decoration: none;
+    }
+
+    .study-map__links a:is(:hover, :focus-visible) {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .study-map__links a:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      inset: 16px 10px auto 43px;
+      border-top: 1px dashed var(--line-strong);
+      transform-origin: left;
+    }
+
+    .schema {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-sizing: border-box;
+      width: 33px;
+      height: 26px;
+      border: 1.5px solid currentColor;
+      border-radius: 3px;
+      background: var(--p-paper-hi);
+    }
+
+    .schema--web { gap: 2px; padding: 7px 3px 3px; }
+    .schema--web::before {
+      content: "";
+      position: absolute;
+      inset: 4px 0 auto;
+      border-top: 1px solid currentColor;
+    }
+    .schema--web i { flex: 1; height: 100%; background: currentColor; opacity: .25; }
+    .schema--web i:first-child { flex: 2; opacity: .7; }
+    .schema--db { flex-direction: column; gap: 3px; padding-inline: 5px; }
+    .schema--db i { width: 100%; height: 2px; background: currentColor; }
+    .schema--api { gap: 2px; font: bold 16px/1 var(--font-mono); }
+    .schema--api i { width: 7px; margin-top: 8px; border-top: 2px solid currentColor; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) .study-map__links a:not(:last-child)::after {
+        animation: ruleDraw 460ms 220ms var(--ease) backwards;
+      }
+      html:not([data-motion="off"]) .study-map__links a:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 15px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0;
+        animation: mapPulse 540ms 420ms ease-in-out;
+      }
+      html:not([data-motion="off"]) .study-map__links a:nth-child(2)::before { animation-delay: 880ms; }
+      html:not([data-motion="off"]) .study-map__links a:nth-child(2)::after { animation-delay: 430ms; }
+      html:not([data-motion="off"]) .schema { transition: transform 180ms var(--ease); }
+      html:not([data-motion="off"]) .study-map a:is(:hover, :focus-visible) .schema { transform: translateY(-3px); }
+      html:not([data-motion="off"]) .study-map a:is(:hover, :focus-visible) .schema--web i:first-child { animation: barSweep 320ms var(--ease); transform-origin: left; }
+      html:not([data-motion="off"]) .study-map a:is(:hover, :focus-visible) .schema--db i { animation: ruleDraw 320ms var(--ease) backwards; transform-origin: left; }
+      html:not([data-motion="off"]) .schema--db i:nth-child(2) { animation-delay: 60ms; }
+      html:not([data-motion="off"]) .schema--db i:last-child { animation-delay: 120ms; }
+      html:not([data-motion="off"]) .study-map a:is(:hover, :focus-visible) .schema--api i { animation: caretBlink 500ms step-end 2; }
+    }
+    @keyframes mapPulse {
+      from { left: 43px; opacity: 0; }
+      20%, 78% { opacity: 1; }
+      to { left: calc(100% - 12px); opacity: 0; }
+    }
+    @keyframes caretBlink { 50% { opacity: 0; } }
 
     .hero--split .hero__top > h1 {
       font-size: clamp(2.85rem, 4.7vw, 4.45rem);
@@ -1746,12 +1860,12 @@
       text-align: center;
       background: var(--p-accent);
       color: var(--p-accent-ink);
-      grid-column: span 5;
+      grid-column: span var(--left-span, 5);
       font-size: 14px;
     }
 
     .grid-example span + span {
-      grid-column: span 7;
+      grid-column: span var(--right-span, 7);
       color: var(--p-inv-bg);
       background: #dce4f2;
     }
@@ -1760,6 +1874,38 @@
       color: var(--p-ink);
       background: #1f3c7c;
     }
+
+    .grid-control, .trim-demo {
+      display: grid;
+      gap: 2px 12px;
+      font-size: 14px;
+      color: var(--p-ink);
+    }
+    .grid-control { grid-template-columns: 1fr auto; align-items: baseline; }
+    #grid-value { color: var(--p-muted); font-family: var(--font-mono); }
+    #grid-span {
+      grid-column: 1 / -1;
+      width: 100%;
+      height: 44px;
+      margin: 0;
+      accent-color: var(--p-accent);
+      cursor: ew-resize;
+    }
+    .stack-detail__code b { color: var(--code-warn); }
+    .trim-demo { gap: 6px; }
+    .trim-demo input {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 44px;
+      padding-inline: 12px;
+      background: var(--p-bg);
+      color: var(--p-ink);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-sm);
+      font: 16px var(--font-mono);
+    }
+    .trim-demo p { margin: 0; }
+    .trim-demo output { font-family: var(--font-mono); color: var(--p-accent); white-space: pre-wrap; overflow-wrap: anywhere; }
 
     .example-row {
       display: flex;
@@ -1886,7 +2032,7 @@
     }
 
     .contact-head {
-      align-items: end;
+      align-items: start;
       row-gap: var(--s-5);
     }
 
@@ -1894,12 +2040,35 @@
       display: flex;
       flex-direction: column;
       gap: var(--s-4);
-      max-width: 56ch;
     }
 
-    .contact-head__cta {
-      justify-content: flex-end;
-      align-self: end;
+    .mail-draft {
+      min-width: 0;
+      position: relative;
+      padding: clamp(16px, 2vw, 30px);
+      background: var(--p-paper-hi);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--r-md);
+      box-shadow: 0 12px 28px -22px rgba(11, 22, 38, .5);
+    }
+    .mail-draft::after {
+      content: "";
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(45deg, var(--p-surface) 47%, var(--line-strong) 50%, var(--ground-bg) 53%);
+      border-left: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .mail-draft dl { display: grid; gap: 9px; margin: 0 0 16px; }
+    .mail-draft dl div { display: grid; grid-template-columns: 6ch 1fr; gap: 12px; align-items: baseline; }
+    .mail-draft dl div + div { padding-top: 9px; border-top: 1px solid var(--line); }
+    .mail-draft dt { font: 14px/1.45 var(--font-text); color: var(--p-muted); }
+    .mail-draft dd { margin: 0; font: 500 15px/1.45 var(--font-text); color: var(--p-ink); overflow-wrap: anywhere; }
+    @media (max-width: 359px) {
+      .mail-draft dl div { grid-template-columns: 1fr; gap: 2px; }
     }
 
     .contact-head__intro {
@@ -1923,13 +2092,6 @@
       font-size: var(--t-small);
       font-weight: 500;
       color: var(--ink);
-    }
-
-    .topic-picker__preview {
-      margin: 2px 0 0;
-      font-size: 14px;
-      line-height: 1.45;
-      color: var(--muted);
     }
 
     .closing .panel-switch {
@@ -2170,8 +2332,7 @@
         gap: var(--s-3);
       }
 
-      .gh-head__cta,
-      .contact-head__cta {
+      .gh-head__cta {
         justify-content: flex-start;
       }
     }
@@ -2301,6 +2462,10 @@
         margin-left: 0;
         margin-top: 2px;
       }
+
+      #stack-info-html .code-box { display: block; }
+      #stack-info-html .code-ln:nth-child(-n + 2) { display: none; }
+      #stack-info-html .stack-detail__code { padding: 8px; }
 
       .sim-width {
         padding-inline: 6px;
@@ -2478,8 +2643,7 @@
         padding-block: 7px;
       }
 
-      .topic-picker__label,
-      .topic-picker__preview {
+      .topic-picker__label {
         display: none;
       }
 
@@ -2677,7 +2841,7 @@
     }
 
     html:not([data-motion="off"]) .study-panel.is-animating,
-    html:not([data-motion="off"]) .topic-picker__preview.is-animating,
+    html:not([data-motion="off"]) #mail-topic-preview.is-animating,
     html:not([data-motion="off"]) .sim-codebar.is-animating {
       animation: panelReveal 280ms cubic-bezier(.22, 1, .36, 1) both;
     }
@@ -2878,7 +3042,7 @@
         <a class="nav__link" href="#kontak">Kontak</a>
       </nav>
       <div class="nav__tools">
-        <button class="theme-btn" type="button" id="theme-btn" aria-pressed="false" aria-label="Aktifkan tema indigo malam" title="Ganti tema">
+        <button class="theme-btn" type="button" id="theme-btn" aria-pressed="false" aria-label="Aktifkan tema gelap" title="Ganti tema">
           <svg class="theme-btn__ic theme-btn__sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
           <svg class="theme-btn__ic theme-btn__moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7Z"/></svg>
         </button>
@@ -2900,9 +3064,16 @@
               <p class="hero__lead">Saya belajar membuat antarmuka web dan memahami cara data berpindah dari basis data ke layar.</p>
               <div class="btn-row">
                 <a class="btn btn--primary" href="https://www.instagram.com/arifquu/" target="_blank" rel="noopener noreferrer">Instagram @arifquu<span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-                <a class="btn btn--secondary" href="#kuliah">Coba 3 simulasi</a>
               </div>
             </div>
+            <nav class="study-map" aria-labelledby="study-map-label">
+              <p id="study-map-label">Coba simulasi saya</p>
+              <div class="study-map__links">
+                <a href="#tab-web"><span class="schema schema--web" aria-hidden="true"><i></i><i></i></span>Antarmuka</a>
+                <a href="#tab-db"><span class="schema schema--db" aria-hidden="true"><i></i><i></i><i></i></span>Basis data</a>
+                <a href="#tab-api"><span class="schema schema--api" aria-hidden="true">&gt;<i></i></span>Backend</a>
+              </div>
+            </nav>
             <ul class="rows rows--spec hero__facts-list">
               <li>
                 <span class="rows__name">Kampus</span>
@@ -3247,18 +3418,23 @@
             </li>
           </ul>
 
-          <div class="stack-reader frame" data-split="gh-reader" data-ui data-visual data-glow="edge-glow" data-fx-palette='{"bg":"#f4f1ea","surface":"#faf8f3","ink":"#191c22","muted":"#4a5160","accent":"#1d3f8a"}' data-glow-params='{"radius":4,"width":1.6,"glow":20,"bloom":0.44,"speed":280,"wash":0.2,"idle":0.2,"fill":1}' aria-live="polite">
+          <div class="stack-reader frame" data-split="gh-reader" data-ui data-visual data-glow="edge-glow" data-fx-palette='{"bg":"#f4f1ea","surface":"#faf8f3","ink":"#191c22","muted":"#4a5160","accent":"#1d3f8a"}' data-glow-params='{"radius":4,"width":1.6,"glow":20,"bloom":0.44,"speed":280,"wash":0.2,"idle":0.2,"fill":1}'>
             <div class="stack-detail" id="stack-info-html">
               <div class="example-view">
-                <p class="stack-detail__copy">Saya memakai CSS Grid untuk membagi ruang antara dua elemen. Di sini, keduanya berbagi 12 kolom.</p>
-                <div class="grid-example"><span>5 kolom</span><span>7 kolom</span></div>
+                <p class="stack-detail__copy">Geser batas antara dua bidang untuk melihat cara CSS Grid membagi 12 kolom.</p>
+                <div class="grid-example" id="grid-example" aria-hidden="true"><span>5</span><span>7</span></div>
+                <div class="grid-control">
+                  <label for="grid-span">Lebar bidang kiri</label>
+                  <span id="grid-value" aria-hidden="true">5 dari 12 kolom</span>
+                  <input id="grid-span" type="range" min="2" max="10" value="5" aria-valuetext="5 kolom kiri, 7 kolom kanan">
+                </div>
               </div>
               <div class="code-box" aria-hidden="true">
                 <div class="code-box__head">
                   <span>tata-letak.css</span>
                   <span class="code-box__lang">CSS Grid</span>
                 </div>
-                <pre class="stack-detail__code"><span class="code-ln"><span class="code-ln__n">01</span><span><span class="sim-kw">.grid-utama</span> {</span></span><span class="code-ln"><span class="code-ln__n">02</span><span>  <span class="sim-kw">display</span>: grid;</span></span><span class="code-ln"><span class="code-ln__n">03</span><span>  <span class="sim-kw">grid-template-columns</span>: repeat(12, 1fr);</span></span><span class="code-ln"><span class="code-ln__n">04</span><span>}</span></span></pre>
+                <pre class="stack-detail__code"><span class="code-ln"><span class="code-ln__n">01</span><span><span class="sim-kw">.grid</span> { display: grid;</span></span><span class="code-ln"><span class="code-ln__n">02</span><span>  grid-template-columns: repeat(12, 1fr); }</span></span><span class="code-ln"><span class="code-ln__n">03</span><span><span class="sim-kw">.kiri</span>  { grid-column: span <b id="code-left">5</b>; }</span></span><span class="code-ln"><span class="code-ln__n">04</span><span><span class="sim-kw">.kanan</span> { grid-column: span <b id="code-right">7</b>; }</span></span></pre>
               </div>
             </div>
             <div class="stack-detail" id="stack-info-js" hidden>
@@ -3293,7 +3469,11 @@
             <div class="stack-detail" id="stack-info-php" hidden>
               <div class="example-view">
                 <p class="stack-detail__copy">Saat membaca nama dari formulir, saya memakai <code>trim()</code> untuk membuang spasi di awal dan akhir.</p>
-                <div class="example-row"><span><small>Masukan</small> <samp>"  Arifqu  "</samp></span><span><small>Hasil</small> <strong>Arifqu</strong></span></div>
+                <div class="trim-demo">
+                  <label for="trim-name">Coba nama dengan spasi</label>
+                  <input id="trim-name" type="text" value="  Arifqu  " maxlength="60" autocomplete="off" spellcheck="false">
+                  <p>Hasil <code>trim()</code> <output for="trim-name" id="trim-result">"Arifqu"</output></p>
+                </div>
               </div>
               <div class="code-box" aria-hidden="true">
                 <div class="code-box__head">
@@ -3313,7 +3493,7 @@
     <div class="wrap">
       <div class="closing__cta close--type">
         <div class="contact-head grid">
-          <div class="contact-head__copy span-7">
+          <div class="contact-head__copy span-6">
             <div class="contact-head__intro">
               <p class="eyebrow eyebrow--sec"><span class="eyebrow__rule" aria-hidden="true"></span>Tautan Langsung</p>
               <h2>Kontak</h2>
@@ -3326,12 +3506,14 @@
                 <button class="panel-switch" type="button" role="radio" aria-checked="false" data-mail-topic="kuliah">Diskusi kuliah</button>
                 <button class="panel-switch" type="button" role="radio" aria-checked="false" data-mail-topic="masukan">Masukan web</button>
               </div>
-              <p class="topic-picker__preview" id="mail-topic-preview">Subjek email: Halo Arifqu, salam kenal dari portofolio</p>
             </div>
           </div>
-          <div class="btn-row contact-head__cta span-5 start-8">
-            <a class="btn btn--primary" href="https://www.instagram.com/arifquu/" target="_blank" rel="noopener noreferrer">Instagram @arifquu<span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-            <a class="btn btn--secondary" id="mail-cta-link" href="mailto:arifqukeren@gmail.com?subject=Halo%20Arifqu%2C%20salam%20kenal%20dari%20portofolio">Kirim email</a>
+          <div class="mail-draft span-6 start-7">
+            <dl>
+              <div><dt>Kepada</dt><dd>arifqukeren@gmail.com</dd></div>
+              <div><dt>Subjek</dt><dd id="mail-topic-preview" aria-live="polite">Halo Arifqu, salam kenal dari portofolio</dd></div>
+            </dl>
+            <a class="btn btn--primary" id="mail-cta-link" href="mailto:arifqukeren@gmail.com?subject=Halo%20Arifqu%2C%20salam%20kenal%20dari%20portofolio">Buka draf email<span class="btn__arrow" aria-hidden="true">&nearr;</span></a>
           </div>
         </div>
 
@@ -3404,19 +3586,14 @@
           || document.documentElement.getAttribute('data-motion') === 'off';
       };
 
-      /* Smooth anchor scroll strictly on click (never slows keyboard Tab focus visibility) */
-      Array.prototype.slice.call(document.querySelectorAll('a[href^="#"]')).forEach(function (anchor) {
-        anchor.addEventListener('click', function (e) {
-          var id = anchor.getAttribute('href');
-          var dest = id && id.length > 1 ? document.querySelector(id) : null;
-          if (!dest || anchor.classList.contains('skip-link')) return;
-          e.preventDefault();
-          var targetTop = dest.getBoundingClientRect().top + window.scrollY;
-          window.scrollTo({ top: targetTop, behavior: isReduced() ? 'auto' : 'smooth' });
-        });
+      // Scope smooth scrolling to link activation so Tab always reveals focus immediately.
+      document.addEventListener('click', function (event) {
+        if (!event.target.closest('a[href^="#"]') || event.defaultPrevented ||
+            event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+        document.documentElement.classList.add('following-anchor');
+        requestAnimationFrame(function () { document.documentElement.classList.remove('following-anchor'); });
       });
 
-      /* Curated Theme Switcher ("Kertas Hangat" <-> "Indigo Malam") with Circular Iris View Transition */
       var themeBtn = document.getElementById('theme-btn');
       var themeMeta = document.querySelector('meta[name="theme-color"]');
       var stackReaderFx = document.querySelector('.stack-reader.frame');
@@ -3424,7 +3601,7 @@
         light: '{"bg":"#f4f1ea","surface":"#faf8f3","ink":"#191c22","muted":"#4a5160","accent":"#1d3f8a"}',
         dark: '{"bg":"#0c1836","surface":"#142754","ink":"#f4f1ea","muted":"#c8d6f4","accent":"#9cc0ff"}'
       };
-      var applyTheme = function (mode) {
+      var applyTheme = function (mode, saveChoice) {
         var dark = mode === 'dark';
         var doc = document.documentElement;
         if (dark) {
@@ -3438,12 +3615,18 @@
         if (stackReaderFx) stackReaderFx.setAttribute('data-fx-palette', dark ? readerPalettes.dark : readerPalettes.light);
         if (themeBtn) {
           themeBtn.setAttribute('aria-pressed', String(dark));
-          themeBtn.setAttribute('aria-label', dark ? 'Aktifkan tema kertas hangat' : 'Aktifkan tema indigo malam');
+          themeBtn.setAttribute('aria-label', dark ? 'Aktifkan tema terang' : 'Aktifkan tema gelap');
         }
-        try { localStorage.setItem('arifqu-theme', dark ? 'dark' : 'light'); } catch (e) {}
+        if (saveChoice) {
+          try { localStorage.setItem('arifqu-theme', mode); } catch {}
+        }
       };
       if (themeBtn) {
         applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
+        matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (event) {
+          try { if (localStorage.getItem('arifqu-theme')) return; } catch {}
+          applyTheme(event.matches ? 'dark' : 'light');
+        });
         var themeSwitchTimer;
         themeBtn.addEventListener('click', function (e) {
           var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -3452,7 +3635,7 @@
           var y = (e && e.clientY) ? e.clientY : rect.top + rect.height / 2;
           var maxR = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
           if (!isReduced() && typeof document.startViewTransition === 'function') {
-            var vt = document.startViewTransition(function () { applyTheme(next); });
+            var vt = document.startViewTransition(function () { applyTheme(next, true); });
             if (vt && vt.ready && vt.ready.then) {
               vt.ready.then(function () {
                 document.documentElement.animate(
@@ -3469,7 +3652,7 @@
                 document.documentElement.classList.remove('is-theme-switching');
               }, 320);
             }
-            applyTheme(next);
+            applyTheme(next, true);
           }
         });
       }
@@ -3836,18 +4019,41 @@
 
       bindPanelGroup('.stack-btn[data-panel-target]');
 
-      function openLinkedExample() {
-        var card = document.getElementById(location.hash.slice(1));
-        if (card && card.matches('.stack-btn[aria-pressed="false"]')) card.click();
+      function showLinkedPanel(hash) {
+        var target = document.getElementById(hash.slice(1));
+        if (target && target.matches('[data-panel-target][aria-pressed="false"]')) target.click();
       }
-      window.addEventListener('hashchange', openLinkedExample);
-      document.getElementById('study-type-link').addEventListener('click', function (event) {
-        if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
-          var card = document.getElementById('stack-ts');
-          if (card && card.matches('.stack-btn[aria-pressed="false"]')) card.click();
-        }
+      document.querySelectorAll('.study-map a, #study-type-link').forEach(function (link) {
+        link.addEventListener('click', function (event) {
+          if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) showLinkedPanel(link.hash);
+        });
       });
-      openLinkedExample();
+
+      var gridRange = document.getElementById('grid-span');
+      var gridExample = document.getElementById('grid-example');
+      function updateGrid() {
+        var left = gridRange.valueAsNumber;
+        var right = 12 - left;
+        gridExample.style.setProperty('--left-span', left);
+        gridExample.style.setProperty('--right-span', right);
+        gridExample.firstElementChild.textContent = left;
+        gridExample.lastElementChild.textContent = right;
+        document.getElementById('code-left').textContent = left;
+        document.getElementById('code-right').textContent = right;
+        document.getElementById('grid-value').textContent = left + ' dari 12 kolom';
+        gridRange.setAttribute('aria-valuetext', left + ' kolom kiri, ' + right + ' kolom kanan');
+      }
+      gridRange.addEventListener('input', updateGrid);
+      updateGrid();
+
+      var trimName = document.getElementById('trim-name');
+      var trimResult = document.getElementById('trim-result');
+      function updateTrim() {
+        // Match PHP trim()'s default character list, including internal spaces verbatim.
+        trimResult.value = JSON.stringify(trimName.value.replace(/^[ \t\r\n\x00\x0B]+|[ \t\r\n\x00\x0B]+$/g, ''));
+      }
+      trimName.addEventListener('input', updateTrim);
+      updateTrim();
 
       var demoButton = document.getElementById('contoh-tombol');
       var demoStatus = document.getElementById('contoh-status');
@@ -3857,15 +4063,33 @@
         demoStatus.value = String(pressed);
       });
 
+      function setRadioState(button, checked) {
+        button.setAttribute('aria-checked', String(checked));
+        button.tabIndex = checked ? 0 : -1;
+      }
       var bindSwitchGroup = function (attr, onSelect) {
         var btns = Array.prototype.slice.call(document.querySelectorAll('[' + attr + ']'));
         if (!btns.length) return;
-        btns.forEach(function (btn) {
+        btns.forEach(function (btn, index) {
+          setRadioState(btn, btn.getAttribute('aria-checked') === 'true');
           btn.addEventListener('click', function () {
             var prev = btns.find(function (b) { return b.getAttribute('aria-checked') === 'true'; });
-            btns.forEach(function (b) { b.setAttribute('aria-checked', String(b === btn)); });
+            btns.forEach(function (b) { setRadioState(b, b === btn); });
             if (prev && prev !== btn) glidePill(btn.parentElement, prev, btn);
             onSelect(btn.getAttribute(attr), btn);
+          });
+          btn.addEventListener('keydown', function (event) {
+            var next;
+            switch (event.key) {
+              case 'ArrowLeft': case 'ArrowUp': next = (index - 1 + btns.length) % btns.length; break;
+              case 'ArrowRight': case 'ArrowDown': next = (index + 1) % btns.length; break;
+              case 'Home': next = 0; break;
+              case 'End': next = btns.length - 1; break;
+              default: return;
+            }
+            event.preventDefault();
+            btns[next].focus();
+            btns[next].click();
           });
         });
       };
@@ -3912,7 +4136,7 @@
         canvasWeb.dataset.mode = mode;
         webSimBox.dataset.mode = mode;
         layoutButtons.forEach(function (btn) {
-          btn.setAttribute('aria-checked', String(btn.dataset.layoutMode === mode));
+          setRadioState(btn, btn.dataset.layoutMode === mode);
         });
         webSimCols.textContent = isMobile ? '1 kolom' : '5 + 6';
         webSimGut.textContent = isMobile ? '24px' : '80px';
@@ -3991,7 +4215,7 @@
         var prevRadio = dbRadios.find(function (r) { return r.getAttribute('aria-checked') === 'true'; });
         var nextRadio = dbRadios.find(function (r) { return r.getAttribute('data-db-node') === active; });
         dbRadios.forEach(function (r) {
-          r.setAttribute('aria-checked', String(r === nextRadio));
+          setRadioState(r, r === nextRadio);
         });
         if (prevRadio && nextRadio && prevRadio !== nextRadio) {
           glidePill(nextRadio.parentElement, prevRadio, nextRadio);
@@ -4105,7 +4329,7 @@
       bindSwitchGroup('data-mail-topic', function (topic) {
         var subj = mailSubjects[topic] || mailSubjects.kenalan;
         if (mailPreview) {
-          mailPreview.textContent = 'Subjek email: ' + subj;
+          mailPreview.textContent = subj;
           pulseAnim(mailPreview);
         }
         if (mailLink) {
@@ -4113,6 +4337,9 @@
           pulseAnim(mailLink, 'cta-flash');
         }
       });
+
+      window.addEventListener('hashchange', function () { showLinkedPanel(location.hash); });
+      showLinkedPanel(location.hash);
 
       var copyBtn = document.querySelector('[data-copy]');
       if (copyBtn) {
