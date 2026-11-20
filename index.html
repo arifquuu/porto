@@ -268,31 +268,28 @@
       transform-origin: left;
     }
 
+    .chapter-contour {
+      position: absolute;
+      inset: 0 0 auto;
+      width: 100%;
+      height: clamp(26px, 5vw, 52px);
+      z-index: 1;
+      fill: none;
+      stroke: #b6cbee;
+      pointer-events: none;
+    }
+    .chapter-contour--end { inset: auto 0 0; transform: rotate(180deg); }
+    .chapter-contour path { vector-effect: non-scaling-stroke; stroke-width: 1; opacity: .56; }
+    .chapter-contour path + path { opacity: .26; }
     @media (prefers-reduced-motion: no-preference) {
-      html:not([data-motion="off"]) #hero-portrait-frame > img {
-        scale: var(--portrait-zoom, 1);
-        transition-property: transform, filter;
+      html:not([data-motion="off"]) #kuliah {
+        clip-path: inset(0 var(--chapter-margin, 0px) round var(--chapter-corner, 0px));
       }
-      [data-scroll-scene="heading"] h2 { position: relative; }
-      html:not([data-motion="off"]) [data-scroll-scene="heading"] h2::after {
-        content: "";
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        width: 1.8em;
-        height: 2px;
-        background: currentColor;
-        opacity: .58;
-        transform: scaleX(calc(1 - var(--scroll-edge, 0)));
-        transform-origin: left;
+      html:not([data-motion="off"]) .chapter-contour path {
+        stroke-dasharray: 1;
+        stroke-dashoffset: var(--contour-offset, 0);
       }
-      html:not([data-motion="off"]) [data-scroll-scene="sequence"] > * {
-        translate: 0 calc(var(--scroll-phase, 0) * 28px);
-      }
-      html:not([data-motion="off"]) .stack-strip[data-scroll-scene] > li {
-        translate: 0 calc(var(--scroll-phase, 0) * clamp(78px, 10vh, 104px));
-        scale: calc(1 - var(--scroll-edge, 0) * .16);
-      }
+      .chapter-contour--end { --contour-offset: var(--exit-offset, 0); }
     }
 
     header.nav.is-scrolled {
@@ -3015,8 +3012,7 @@
       .stack-btn,
       .stack-strip .ic-tile img,
       .stack-detail__copy,
-      .code-box,
-      [data-scroll-scene] {
+      .code-box {
         transition: none !important;
         transform: none !important;
       }
@@ -3116,15 +3112,23 @@
     </section>
 
     <section class="section ground-inverse" id="kuliah" aria-labelledby="kuliah-h" data-fx="contour-lines" data-fx-seed="17" data-fx-palette='{"bg":"#112451","surface":"#173068","ink":"#f4f1ea","muted":"#d4def5","accent":"#9cc0ff"}' data-fx-params='{"opacity":0.28,"levels":22,"scale":1.42,"tint":0.56,"shade":0.46,"calm":0.84,"calmX":0.24,"calmY":0.48}'>
+      <svg class="chapter-contour" viewBox="0 0 1200 52" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path pathLength="1" d="M-12 10 C135 49 280 46 445 21 S768 -3 931 20 S1128 39 1212 15"/>
+        <path pathLength="1" d="M-12 17 C144 55 292 51 454 28 S770 3 935 26 S1131 45 1212 21"/>
+      </svg>
+      <svg class="chapter-contour chapter-contour--end" viewBox="0 0 1200 52" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path pathLength="1" d="M-12 10 C135 49 280 46 445 21 S768 -3 931 20 S1128 39 1212 15"/>
+        <path pathLength="1" d="M-12 17 C144 55 292 51 454 28 S770 3 935 26 S1131 45 1212 21"/>
+      </svg>
       <div class="wrap" data-moment="cursor-spotlight" data-moment-opts='{"rest":[0.72,0.44],"radius":560,"grid":false}'>
         <div class="grid kuliah-grid">
           <div class="kuliah-intro span-5">
-            <div class="kuliah-intro__head" data-scroll-scene="heading">
+            <div class="kuliah-intro__head">
               <p class="eyebrow eyebrow--sec"><span class="eyebrow__rule" aria-hidden="true"></span>Fokus Perkuliahan</p>
               <h2 id="kuliah-h">Studi di Sistem Informasi</h2>
               <p class="lead">Sebelum menulis kode, saya memetakan kebutuhan pengguna dan alur datanya.</p>
             </div>
-            <div class="study-tabs" data-scroll-scene="sequence" role="group" aria-label="Pilih fokus belajar Sistem Informasi">
+            <div class="study-tabs" role="group" aria-label="Pilih fokus belajar Sistem Informasi">
               <button class="study-tab" type="button" id="tab-web" aria-pressed="true" aria-controls="panel-web" data-panel-target="panel-web" data-track-id="web">
                 <span class="study-tab__left">
                   <span class="study-tab__num">01</span>
@@ -3368,7 +3372,7 @@
       <div class="wrap gh-wrap">
         <div class="gh-band gh-band--top">
           <div class="gh-head grid">
-            <div class="gh-head__copy span-9" data-scroll-scene="heading">
+            <div class="gh-head__copy span-9">
               <p class="eyebrow eyebrow--sec"><span class="eyebrow__rule" aria-hidden="true"></span>Bahasa &amp; Perangkat</p>
               <h2>GitHub &amp; teknologi</h2>
               <p class="lead">Saya menyimpan latihan pemrograman saya di GitHub.</p>
@@ -3382,7 +3386,7 @@
         </div>
 
         <div class="gh-band gh-band--bottom">
-          <ul class="stack-strip" data-scroll-scene="sequence" aria-label="Pilih bahasa untuk melihat catatan belajar">
+          <ul class="stack-strip" aria-label="Pilih bahasa untuk melihat catatan belajar">
             <li class="stack-strip__item">
               <button class="stack-btn" type="button" id="stack-html" aria-pressed="true" aria-controls="stack-info-html" data-panel-target="stack-info-html">
                 <span class="stack-btn__top">
@@ -3517,7 +3521,7 @@
       <div class="closing__cta close--type">
         <div class="contact-head grid">
           <div class="contact-head__copy span-6">
-            <div class="contact-head__intro" data-scroll-scene="heading">
+            <div class="contact-head__intro">
               <p class="eyebrow eyebrow--sec"><span class="eyebrow__rule" aria-hidden="true"></span>Tautan Langsung</p>
               <h2>Kontak</h2>
               <p class="lead">Sapa saya lewat Instagram, atau pilih topik untuk mengisi subjek email.</p>
@@ -3540,7 +3544,7 @@
           </div>
         </div>
 
-        <ul class="rows rows--spec rows--contact" data-scroll-scene="sequence">
+        <ul class="rows rows--spec rows--contact">
           <li>
             <span class="rows__name">Instagram</span>
             <span class="rows__value"><a class="link" href="https://www.instagram.com/arifquu/" target="_blank" rel="noopener noreferrer">@arifquu</a></span>
@@ -3771,7 +3775,7 @@
       var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
 
       var progressLine = header.querySelector('.reading-progress');
-      var visibleScenes = new Map();
+      var studySection = document.getElementById('kuliah');
       var motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
       var activeSection;
       var pendingScrollFrame = 0;
@@ -3780,7 +3784,7 @@
         pendingScrollFrame = 0;
         var maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
         var y = Math.min(maxY, Math.max(0, window.scrollY));
-        updateScrollScenes(y);
+        updateChapterTransition();
         progressLine.style.transform = 'scaleX(' + (maxY ? y / maxY : 0) + ')';
         header.classList.toggle('is-scrolled', y > 24);
 
@@ -3806,76 +3810,32 @@
       if ('ResizeObserver' in window) new ResizeObserver(scheduleReadingPosition).observe(document.body);
       updateReadingPosition();
 
-      function clearScene(scene) {
-        scene.items.forEach(function (item) {
-          item.style.removeProperty('--scroll-phase');
-          item.style.removeProperty('--scroll-edge');
-        });
-      }
-
-      function smoothFraction(value) {
+      function easedProgress(value) {
         var t = Math.min(1, Math.max(0, value));
         return t * t * (3 - 2 * t);
       }
 
-      function updateScrollScenes(y) {
-        if (isReduced()) {
-          portraitFrame.style.removeProperty('--portrait-zoom');
-          visibleScenes.forEach(clearScene);
-          return;
-        }
-        var viewport = window.innerHeight;
-        var zoom = 1 + .24 * Math.min(1, y / (viewport * .52));
-        portraitFrame.style.setProperty('--portrait-zoom', zoom.toFixed(4));
-        var band = Math.min(480, viewport * .54);
-        var step = Math.min(32, band * .08);
-        var headerHeight = header.offsetHeight;
+      function updateChapterTransition() {
+        if (isReduced()) return;
+        var bounds = studySection.getBoundingClientRect();
+        var height = window.innerHeight;
+        if (bounds.top > height || bounds.bottom < 0) return;
 
-        // Measure the stationary groups before moving their contents.
-        visibleScenes.forEach(function (scene, group) {
-          var rect = group.getBoundingClientRect();
-          scene.top = rect.top;
-          scene.bottom = rect.bottom;
-        });
-        visibleScenes.forEach(function (scene, group) {
-          if (group.contains(document.activeElement)) {
-            clearScene(scene);
-            return;
-          }
-          scene.items.forEach(function (item, index) {
-            var reverseIndex = scene.items.length - 1 - index;
-            var lower = smoothFraction((scene.top - viewport + band + index * step) / band);
-            var upper = smoothFraction((headerHeight + band + reverseIndex * step - scene.bottom) / band);
-            var phase = lower - upper;
-            item.style.setProperty('--scroll-phase', phase.toFixed(4));
-            item.style.setProperty('--scroll-edge', Math.abs(phase).toFixed(4));
-          });
-        });
+        var readingHeight = Math.max(1, height - header.offsetHeight);
+        var entry = easedProgress((height - bounds.top) / readingHeight);
+        var exit = easedProgress((height - bounds.bottom) / readingHeight);
+        var edge = Math.max(1 - entry, exit);
+        var margin = Math.min(36, window.innerWidth * .035);
+        studySection.style.setProperty('--chapter-margin', (margin * edge).toFixed(2) + 'px');
+        studySection.style.setProperty('--chapter-corner', (edge * 32).toFixed(2) + 'px');
+        studySection.style.setProperty('--contour-offset', (1 - entry).toFixed(4));
+        studySection.style.setProperty('--exit-offset', (1 - exit).toFixed(4));
       }
 
-      if ('IntersectionObserver' in window) {
-        var sceneObserver = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            entry.target.querySelectorAll('[data-scroll-scene]').forEach(function (group) {
-              if (entry.isIntersecting) {
-                var items = group.dataset.scrollScene === 'sequence' ? Array.from(group.children) : [group];
-                visibleScenes.set(group, { items: items });
-              } else if (visibleScenes.has(group)) {
-                clearScene(visibleScenes.get(group));
-                visibleScenes.delete(group);
-              }
-            });
-          });
-          scheduleReadingPosition();
-        }, { rootMargin: '64px 0px' });
-        targets.forEach(function (section) { sceneObserver.observe(section); });
-        motionPreference.addEventListener('change', scheduleReadingPosition);
-        new MutationObserver(scheduleReadingPosition).observe(document.documentElement, {
-          attributes: true, attributeFilter: ['data-motion']
-        });
-        document.addEventListener('focusin', scheduleReadingPosition);
-        document.addEventListener('focusout', scheduleReadingPosition);
-      }
+      motionPreference.addEventListener('change', scheduleReadingPosition);
+      new MutationObserver(scheduleReadingPosition).observe(document.documentElement, {
+        attributes: true, attributeFilter: ['data-motion']
+      });
 
       var stageTag = document.getElementById('wb-stage-tag');
       var trackLabels = {
