@@ -279,15 +279,19 @@
       pointer-events: none;
     }
     .chapter-contour--end { inset: auto 0 0; transform: rotate(180deg); }
-    .chapter-contour path { vector-effect: non-scaling-stroke; stroke-width: 1; opacity: .56; }
+    .chapter-contour path { vector-effect: non-scaling-stroke; stroke-width: var(--ridge-width, 1); opacity: var(--ridge-opacity, .56); }
     .chapter-contour path + path { opacity: .26; }
+    .contour-foil { display: none; --ridge-width: 1.6; --ridge-opacity: 1; }
     @media (prefers-reduced-motion: no-preference) {
       html:not([data-motion="off"]) #kuliah {
         clip-path: inset(0 var(--chapter-margin, 0px) round var(--chapter-corner, 0px));
       }
-      html:not([data-motion="off"]) .chapter-contour path {
-        stroke-dasharray: 1;
-        stroke-dashoffset: var(--contour-offset, 0);
+      html:not([data-motion="off"]) .chapter-contour {
+        clip-path: inset(0 calc(var(--contour-offset, 0) * 100%) 0 0);
+      }
+      html:not([data-motion="off"]) .contour-foil {
+        display: inline;
+        opacity: var(--foil-intensity, 0);
       }
       .chapter-contour--end { --contour-offset: var(--exit-offset, 0); }
     }
@@ -3113,12 +3117,25 @@
 
     <section class="section ground-inverse" id="kuliah" aria-labelledby="kuliah-h" data-fx="contour-lines" data-fx-seed="17" data-fx-palette='{"bg":"#112451","surface":"#173068","ink":"#f4f1ea","muted":"#d4def5","accent":"#9cc0ff"}' data-fx-params='{"opacity":0.28,"levels":22,"scale":1.42,"tint":0.56,"shade":0.46,"calm":0.84,"calmX":0.24,"calmY":0.48}'>
       <svg class="chapter-contour" viewBox="0 0 1200 52" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path pathLength="1" d="M-12 10 C135 49 280 46 445 21 S768 -3 931 20 S1128 39 1212 15"/>
+        <defs>
+          <linearGradient id="entry-foil" gradientUnits="userSpaceOnUse" x1="-184" x2="0">
+            <stop stop-color="#dac6a3" stop-opacity="0"/>
+            <stop offset=".68" stop-color="#dbc6a2" stop-opacity=".88"/>
+            <stop offset=".92" stop-color="#fff1d8"/>
+            <stop offset="1" stop-color="#fcf0db" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path id="entry-ridge" d="M-12 10 C135 49 280 46 445 21 S768 -3 931 20 S1128 39 1212 15"/>
         <path pathLength="1" d="M-12 17 C144 55 292 51 454 28 S770 3 935 26 S1131 45 1212 21"/>
+        <use class="contour-foil" href="#entry-ridge" stroke="url(#entry-foil)"/>
       </svg>
       <svg class="chapter-contour chapter-contour--end" viewBox="0 0 1200 52" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path pathLength="1" d="M-12 10 C135 49 280 46 445 21 S768 -3 931 20 S1128 39 1212 15"/>
+        <defs>
+          <linearGradient id="exit-foil" href="#entry-foil"/>
+        </defs>
+        <path id="exit-ridge" d="M-12 10 C135 49 280 46 445 21 S768 -3 931 20 S1128 39 1212 15"/>
         <path pathLength="1" d="M-12 17 C144 55 292 51 454 28 S770 3 935 26 S1131 45 1212 21"/>
+        <use class="contour-foil" href="#exit-ridge" stroke="url(#exit-foil)"/>
       </svg>
       <div class="wrap" data-moment="cursor-spotlight" data-moment-opts='{"rest":[0.72,0.44],"radius":560,"grid":false}'>
         <div class="grid kuliah-grid">
@@ -3776,6 +3793,8 @@
 
       var progressLine = header.querySelector('.reading-progress');
       var studySection = document.getElementById('kuliah');
+      var entryFoil = document.getElementById('entry-foil');
+      var exitFoil = document.getElementById('exit-foil');
       var motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
       var activeSection;
       var pendingScrollFrame = 0;
@@ -3830,6 +3849,14 @@
         studySection.style.setProperty('--chapter-corner', (edge * 32).toFixed(2) + 'px');
         studySection.style.setProperty('--contour-offset', (1 - entry).toFixed(4));
         studySection.style.setProperty('--exit-offset', (1 - exit).toFixed(4));
+        positionFoil(entryFoil, entry);
+        positionFoil(exitFoil, exit);
+      }
+
+      function positionFoil(gradient, progress) {
+        // Both contour drawings use a 1200-unit viewBox, including on narrow screens.
+        gradient.setAttribute('gradientTransform', 'translate(' + (1200 * progress).toFixed(1) + ' 0)');
+        gradient.ownerSVGElement.style.setProperty('--foil-intensity', Math.sin(Math.PI * progress).toFixed(3));
       }
 
       motionPreference.addEventListener('change', scheduleReadingPosition);
