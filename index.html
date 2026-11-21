@@ -749,7 +749,7 @@
       opacity: 1;
     }
 
-    .hero__media > :is(img, .portrait-print) {
+    .hero__media > :is(img, .portrait-print, .portrait-sketch) {
       border-radius: var(--r-sm);
       border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
       transform-origin: center 36%;
@@ -757,12 +757,12 @@
       will-change: transform;
     }
 
-    .hero__media.is-lit > :is(img, .portrait-print) {
+    .hero__media.is-lit > :is(img, .portrait-print, .portrait-sketch) {
       transition: transform 140ms cubic-bezier(.22, 1, .36, 1), filter 900ms cubic-bezier(.22, 1, .36, 1);
     }
 
     @media (prefers-reduced-motion: no-preference) {
-      html:not([data-motion="off"]) .hero__media > :is(img, .portrait-print) {
+      html:not([data-motion="off"]) .hero__media > :is(img, .portrait-print, .portrait-sketch) {
         scale: calc(1 + .09 * var(--portrait-travel, 0));
       }
       html:not([data-motion="off"]) .portrait-print {
@@ -780,7 +780,7 @@
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .hero__media:hover > :is(img, .portrait-print) {
+      .hero__media:hover > :is(img, .portrait-print, .portrait-sketch) {
         transform: translate3d(var(--img-x), var(--img-y), 0) scale(1.024);
       }
     }
@@ -1870,7 +1870,6 @@
         transition: scale 480ms cubic-bezier(.22, 1, .36, 1);
       }
     }
-    .proof-sheet--drawing img { filter: url(#portrait-etch); }
     .proof-sheet--drawing .proof-photo::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 22px, #9bbec025 22px 23px); }
     .proof-seam {
       position: absolute; bottom: 0; left: var(--reveal); height: 16px; width: 1.5px;
@@ -3468,6 +3467,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="assets/portfolio.css">
   <script src="assets/backgrounds/backgrounds.js"></script>
 </head>
 <body>
@@ -3537,8 +3537,10 @@
           </div>
           <div class="hero__media span-6 start-7" id="hero-portrait-frame">
             <img src="assets/images/arifqu-portrait.jpg" width="676" height="892" alt="Potret M. Arifqu Wa Liin mengenakan kemeja batik indigo" fetchpriority="high" decoding="async">
+            <span class="portrait-sketch" aria-hidden="true"></span>
             <span class="portrait-print" aria-hidden="true"></span>
             <span class="portrait-mat" aria-hidden="true"></span>
+            <button class="photo-open" type="button" data-view-photo="portrait" aria-haspopup="dialog" hidden>Lihat potret</button>
           </div>
         </div>
       </div>
@@ -3679,9 +3681,16 @@
                   </div>
                   <label class="sim-width">
                     <span>Lebar layar</span>
-                    <input id="sim-width" type="range" min="390" max="1280" value="1280" aria-valuetext="1280 piksel" aria-controls="web-sim-box">
+                    <span class="sim-scale">
+                      <input id="sim-width" type="range" min="390" max="1280" value="1280" aria-valuetext="1280 piksel" aria-controls="web-sim-box">
+                    </span>
                     <span class="web-sim__ruler" id="web-sim-ruler" aria-hidden="true">1280px</span>
                   </label>
+                  <div class="breakpoint-tools" role="group" aria-label="Bandingkan tata letak di batas 768 piksel">
+                    <span>Uji batas kolom</span>
+                    <button type="button" data-width="767" aria-pressed="false">767 px</button>
+                    <button type="button" data-width="768" aria-pressed="false">768 px</button>
+                  </div>
                 </div>
 
                 <div class="study-panel" id="panel-db" hidden>
@@ -3822,20 +3831,9 @@
         </div>
         <div class="profile-proof">
           <div class="proof-stage" role="img" aria-label="Poster profil Arifqu dalam tiga tahap: sketsa garis, cetakan tinta, dan foto berwarna.">
-            <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
-              <defs><filter id="portrait-etch" color-interpolation-filters="sRGB">
-                <feColorMatrix type="saturate" values="0"/>
-                <feConvolveMatrix order="3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1" divisor=".45" preserveAlpha="true"/>
-                <feComponentTransfer>
-                  <feFuncR type="table" tableValues=".09 .57 .84"/>
-                  <feFuncG type="table" tableValues=".17 .71 .91"/>
-                  <feFuncB type="table" tableValues=".23 .72 .89"/>
-                </feComponentTransfer>
-              </filter></defs>
-            </svg>
             <div class="proof-sheet proof-sheet--drawing" aria-hidden="true">
               <div class="proof-type"><small>UNTAN · Pontianak</small><span class="proof-name">M. Arifqu<br>Wa Liin</span><small>Mahasiswa Sistem Informasi</small></div>
-              <div class="proof-photo"><img src="assets/images/arifqu-portrait.jpg" alt="" width="676" height="892" loading="lazy"></div>
+              <div class="proof-photo"><img src="assets/images/arifqu-sketch.webp" alt="" width="676" height="892" loading="lazy"></div>
             </div>
             <div class="proof-sheet proof-sheet--ink" aria-hidden="true">
               <div class="proof-type"><small>UNTAN · Pontianak</small><span class="proof-name">M. Arifqu<br>Wa Liin</span><small>Mahasiswa Sistem Informasi</small></div>
@@ -3855,6 +3853,7 @@
               <button type="button" data-stop="50" aria-pressed="true">Cetak</button>
               <button type="button" data-stop="100" aria-pressed="false">Warna</button>
             </div>
+            <button class="photo-open" type="button" data-view-photo="poster" aria-haspopup="dialog" hidden>Perbesar poster</button>
             <label class="proof-follow"><input type="checkbox" id="proof-follow" checked>Ikuti guliran</label>
           </div>
         </div>
@@ -3892,7 +3891,7 @@
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
                     <img class="ic ic-tall" src="assets/icons/html-5.svg" width="256" height="361" alt="" loading="lazy" decoding="async">
                   </span>
-                  <span class="stack-btn__idx" aria-hidden="true">01</span>
+                  <span class="stack-btn__idx" aria-hidden="true">.css</span>
                 </span>
                 <div>
                   <div class="ic-cell__name">HTML5 &amp; CSS</div>
@@ -3906,7 +3905,7 @@
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
                     <img class="ic" src="assets/icons/javascript.svg" width="256" height="256" alt="" loading="lazy" decoding="async">
                   </span>
-                  <span class="stack-btn__idx" aria-hidden="true">02</span>
+                  <span class="stack-btn__idx" aria-hidden="true">.js</span>
                 </span>
                 <div>
                   <div class="ic-cell__name">JavaScript</div>
@@ -3920,7 +3919,7 @@
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
                     <img class="ic" src="assets/icons/typescript-icon.svg" width="256" height="256" alt="" loading="lazy" decoding="async">
                   </span>
-                  <span class="stack-btn__idx" aria-hidden="true">03</span>
+                  <span class="stack-btn__idx" aria-hidden="true">.ts</span>
                 </span>
                 <div>
                   <div class="ic-cell__name">TypeScript</div>
@@ -3934,7 +3933,7 @@
                   <span class="ic-tile ic-tile--40" aria-hidden="true">
                     <img class="ic ic-land" src="assets/icons/php.svg" width="256" height="135" alt="" loading="lazy" decoding="async">
                   </span>
-                  <span class="stack-btn__idx" aria-hidden="true">04</span>
+                  <span class="stack-btn__idx" aria-hidden="true">.php</span>
                 </span>
                 <div>
                   <div class="ic-cell__name">PHP</div>
@@ -4046,6 +4045,7 @@
               <div class="mail-actions__links">
                 <a class="btn btn--primary" id="mail-cta-link" href="mailto:arifqukeren@gmail.com?subject=Halo%20Arifqu%2C%20salam%20kenal%20dari%20portofolio">Buka draf email<span class="btn__arrow" aria-hidden="true">&nearr;</span></a>
                 <a class="mail-save" href="assets/arifqu.vcf" download="Arifqu.vcf">Simpan kontak</a>
+                <button class="mail-save draft-copy" type="button" hidden>Salin draf</button>
               </div>
               <svg class="postmark" width="122" height="74" viewBox="0 0 122 74" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                 <g class="postmark__seal">
@@ -4098,6 +4098,7 @@
       </div>
 
       <div class="closing__links">
+        <span class="sr-only" role="status" id="clipboard-notice"></span>
         <div class="footer__legal">
           <p>&copy; <span class="footer__year">2026</span> M. Arifqu Wa Liin, Pontianak</p>
           <div class="socials">
@@ -4116,6 +4117,27 @@
     </div>
   </footer>
 
+  <dialog class="photo-viewer" id="photo-viewer" aria-labelledby="viewer-heading">
+    <header class="viewer-head">
+      <h2 id="viewer-heading">Potret M. Arifqu Wa Liin</h2>
+      <form method="dialog"><button type="submit" autofocus aria-label="Tutup galeri">&times;</button></form>
+    </header>
+    <div class="viewer-stage"></div>
+    <div class="viewer-picks" role="group" aria-label="Pilih tampilan">
+      <button type="button" data-plate="portrait">Potret asli</button>
+      <button type="button" data-plate="drawing">Sketsa</button>
+      <button type="button" data-plate="ink">Cetak</button>
+      <button type="button" data-plate="print">Warna</button>
+    </div>
+  </dialog>
+  <dialog class="manual-copy" id="manual-copy" aria-labelledby="manual-heading">
+    <header>
+      <h2 id="manual-heading">Salin teks secara manual</h2>
+      <form method="dialog"><button type="submit" aria-label="Tutup">&times;</button></form>
+    </header>
+    <textarea readonly rows="7" aria-label="Teks untuk disalin"></textarea>
+  </dialog>
+  <script type="module" src="assets/portfolio.js"></script>
   <script type="module" src="assets/system.js"></script>
   <script type="module" src="assets/motion/motion.js"></script>
   <script type="module" src="assets/layout/layout.js"></script>
@@ -4500,6 +4522,7 @@
             var travel = easedProgress(portraitTravel);
             targets[0].style.setProperty('--portrait-travel', travel.toFixed(4));
             var plate = easedProgress(portraitTravel / .62);
+            portraitFrame.style.setProperty('--sketch-band', (22 * Math.sin(Math.PI * plate)).toFixed(2) + '%');
             portraitFrame.style.setProperty('--ink-left', (119 - 142 * plate).toFixed(2) + '%');
             portraitFrame.style.setProperty('--ink-right', (101 - 142 * plate).toFixed(2) + '%');
           }
@@ -4810,6 +4833,7 @@
       var webBarA = document.getElementById('web-bar-a');
       var webBarB = document.getElementById('web-bar-b');
       var widthSlider = document.getElementById('sim-width');
+      var widthStops = document.querySelectorAll('.breakpoint-tools button');
       var layoutButtons = document.querySelectorAll('[data-layout-mode]');
       var previewAside = webSimBox.querySelector('.web-sim__aside');
       var reflowAnimation;
@@ -4828,6 +4852,9 @@
         }
 
         widthSlider.value = width;
+        widthStops.forEach(function (stop) {
+          stop.setAttribute('aria-pressed', String(Number(stop.dataset.width) === width));
+        });
         widthSlider.setAttribute('aria-valuetext', width + ' piksel');
         webSimRuler.textContent = width + 'px';
         canvasWeb.classList.toggle('is-resizing', scrubbing);
@@ -4861,6 +4888,9 @@
 
       widthSlider.addEventListener('input', function () {
         setPreviewWidth(widthSlider.valueAsNumber, true);
+      });
+      widthStops.forEach(function (stop) {
+        stop.addEventListener('click', function () { setPreviewWidth(Number(stop.dataset.width), false); });
       });
       bindSwitchGroup('data-layout-mode', function (mode) {
         setPreviewWidth(Number(mode === 'mobile' ? widthSlider.min : widthSlider.max), false);
