@@ -2776,7 +2776,9 @@
     @media (min-width: 640px) and (max-width: 1023px) {
       .hero--split .hero__grid {
         display: grid; gap: clamp(20px, 4vw, 40px);
-        grid-template: "intro photo" minmax(min-content, 1fr) "map photo" auto "facts facts" auto / repeat(2, minmax(0, 1fr));
+        grid-template-areas: "intro photo" "map photo" "facts facts";
+        grid-template-rows: minmax(min-content, 1fr) auto auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
       .hero--split .hero__text { display: contents; }
       .hero__top { grid-area: intro; align-self: center; }
