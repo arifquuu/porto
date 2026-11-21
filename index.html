@@ -135,6 +135,19 @@
     ::view-transition-new(root) {
       z-index: 9999;
     }
+    @media (prefers-reduced-motion: no-preference) {
+      html[data-chapter-jump] header.nav { view-transition-name: chapter-header; }
+      html[data-chapter-jump]::view-transition-group(chapter-header),
+      html[data-chapter-jump]::view-transition-old(chapter-header),
+      html[data-chapter-jump]::view-transition-new(chapter-header) { animation: none; }
+      html[data-chapter-jump]::view-transition-old(chapter-header) { opacity: 0; }
+      html[data-chapter-jump]::view-transition-new(root) {
+        animation: chapter-forward 340ms cubic-bezier(.24,.75,.26,1) both;
+      }
+      html[data-chapter-jump="up"]::view-transition-new(root) { animation-name: chapter-back; }
+    }
+    @keyframes chapter-forward { from { clip-path: inset(100% 0 0); } to { clip-path: inset(0); } }
+    @keyframes chapter-back { from { clip-path: inset(0 0 100%); } to { clip-path: inset(0); } }
 
     @media (min-width: 1200px) and (min-height: 820px) {
       :root {
@@ -1736,11 +1749,18 @@
       overflow-x: clip;
     }
 
-    #proses { height: auto; min-height: 100svh; }
-    #proses > .wrap { gap: clamp(18px, 3vh, 32px); }
+    #proses { --proof-top: calc(var(--nav) + 16px); display: block; height: auto; min-height: 100svh; padding-top: var(--proof-top); }
+    #proses > .wrap { height: auto; gap: clamp(12px, 2vh, 24px); }
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) #proses.can-pin {
+        height: calc(2 * var(--proof-run));
+        padding-bottom: var(--proof-foot);
+      }
+      html:not([data-motion="off"]) #proses.can-pin > .wrap { position: sticky; top: var(--proof-top); }
+    }
     .proof-heading { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); align-items: baseline; gap: 8px 24px; }
     .proof-heading label { max-width: 40ch; color: var(--muted); }
-    .profile-proof { --reveal: 50%; margin: 0; }
+    .profile-proof { --reveal: 50%; --paper-cut: 0%; --color-cut: 100%; margin: 0; }
     .proof-stage {
       position: relative;
       isolation: isolate;
@@ -1769,7 +1789,27 @@
       background-image: linear-gradient(#27546620 1px, transparent 1px), linear-gradient(90deg,#27546620 1px, transparent 1px);
       background-size: 23px 23px;
     }
-    .proof-sheet--print { color: #192b38; background: #ede9df; clip-path: inset(0 calc(100% - var(--reveal)) 0 0); }
+    .proof-sheet--ink {
+      color: #40261d; background: #ddbaa0;
+      clip-path: inset(var(--paper-cut) 0 0);
+    }
+    .proof-sheet--ink .proof-name {
+      font-family: Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.065em;
+    }
+    .proof-sheet--ink .proof-photo { background: #ddbaa0; }
+    .proof-sheet--ink .proof-photo img { mix-blend-mode: multiply; }
+    .proof-sheet--print { color: #192b38; background: #ede9df; clip-path: inset(0 var(--color-cut) 0 0); }
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) .profile-proof.is-stepping .proof-sheet { transition: clip-path 480ms cubic-bezier(.22, 1, .36, 1); }
+    }
+    .proof-stops { display: flex; align-items: center; gap: 4px; }
+    .proof-stops button {
+      min-height: 44px; padding: 0 9px; border: 0; background: transparent; color: var(--muted);
+      font: 500 14px var(--font-text); cursor: pointer; text-underline-offset: 5px;
+    }
+    .proof-stops button[aria-pressed="true"] { color: var(--ink); text-decoration: underline; }
+    .proof-legend { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 12px; }
+    .proof-legend .proof-follow { margin-left: auto; }
     html[data-theme="dark"] .proof-sheet--print { color: var(--p-ink); background: var(--p-paper-hi); }
     html[data-theme="dark"] .proof-sheet--drawing {
       color: #c6dcd9;
@@ -1784,16 +1824,39 @@
     .proof-photo { position: relative; min-height: 0; overflow: hidden; }
     .proof-photo img { display: block; width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; object-position: 50% 35%; }
     .proof-sheet--drawing .proof-photo { outline: 1px solid #7195a2; }
+    .proof-sheet--drawing .proof-name { position: relative; }
+    .proof-sheet--drawing .proof-name::before, .proof-sheet--drawing .proof-name::after {
+      content: ""; position: absolute; left: 0; right: 0;
+      border-top: 1px dashed currentColor; color: #638490; pointer-events: none;
+    }
+    .proof-sheet--drawing .proof-name::before { top: .22em; }
+    .proof-sheet--drawing .proof-name::after { bottom: .08em; }
+    .proof-sheet--drawing .proof-photo::before {
+      content: ""; position: absolute; inset: 8%; z-index: 1; pointer-events: none;
+      --guide: linear-gradient(#b9d4d7, #b9d4d7);
+      background: var(--guide) left top, var(--guide) right top, var(--guide) left bottom, var(--guide) right bottom,
+        var(--guide) left top, var(--guide) right top, var(--guide) left bottom, var(--guide) right bottom;
+      background-size: 18px 1px,18px 1px,18px 1px,18px 1px,1px 18px,1px 18px,1px 18px,1px 18px;
+      background-repeat: no-repeat;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) .proof-photo img {
+        transform-origin: 50% 32%; scale: var(--proof-zoom, 1);
+      }
+      html:not([data-motion="off"]) .profile-proof.is-stepping .proof-photo img {
+        transition: scale 480ms cubic-bezier(.22, 1, .36, 1);
+      }
+    }
     .proof-sheet--drawing img { filter: url(#portrait-etch); }
     .proof-sheet--drawing .proof-photo::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 22px, #9bbec025 22px 23px); }
     .proof-seam {
-      position: absolute; top: 0; bottom: 0; left: var(--reveal); width: 1.5px;
+      position: absolute; bottom: 0; left: var(--reveal); height: 16px; width: 1.5px;
       background: linear-gradient(180deg, #dac6a3 0%, #fff1d8 var(--seam-y, 50%), #dac6a3 100%);
       pointer-events: none;
     }
     .proof-grip {
-      position: absolute; left: clamp(17px, var(--reveal), calc(100% - 17px)); top: 78%;
-      translate: -50% -50%; width: 32px; height: 32px; padding: 6px;
+      position: absolute; left: clamp(17px, var(--reveal), calc(100% - 17px)); bottom: 8px;
+      translate: -50% 0; width: 32px; height: 32px; padding: 6px;
       border: 1px solid #67706d; border-radius: 50%; pointer-events: none;
       background: #faf8f3; color: #273b42; box-shadow: 0 2px 8px #10252b38;
       transition: transform 200ms cubic-bezier(.22, 1, .36, 1), box-shadow 200ms var(--ease), border-color 200ms var(--ease);
@@ -1807,14 +1870,12 @@
     }
     .proof-follow { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; justify-self: end; cursor: pointer; white-space: nowrap; }
     .proof-follow input { accent-color: var(--p-accent); width: 17px; height: 17px; }
-    .proof-toolbar { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; column-gap: 32px; font-size: 14px; }
+    .proof-legend { font-size: 14px; }
     @media (max-width: 639px) {
-      .proof-toolbar { grid-template-columns: 1fr; }
       body:has(.nav__link[href="#proses"][aria-current="page"]) > nav.actionbar { display: none; }
     }
-    @media (prefers-reduced-motion: reduce) { .proof-follow { display: none; } .proof-toolbar { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { .proof-follow { display: none; } }
     html[data-motion="off"] .proof-follow { display: none; }
-    html[data-motion="off"] .proof-toolbar { grid-template-columns: 1fr; }
     .proof-controls { display: grid; grid-template-columns: auto minmax(60px,1fr) auto; gap: clamp(10px,2vw,28px); align-items: center; font: 500 14px/1.4 var(--font-text); }
     .proof-controls input { width: 100%; height: 44px; margin: 0; appearance: none; background: transparent; cursor: ew-resize; }
     .proof-controls input::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, var(--ink) var(--reveal), var(--line-strong) var(--reveal)); }
@@ -3689,10 +3750,10 @@
       <div class="wrap">
         <div class="proof-heading">
           <h2 id="proof-title">Dari sketsa ke layar</h2>
-          <label for="proof-reveal">Gulir atau geser pembatas untuk membandingkan rancangan dan tampilan profil saya.</label>
+          <label for="proof-reveal">Gulir untuk melihat sketsa menjadi cetakan tinta, lalu foto berwarna. Geser penanda untuk mengatur sendiri.</label>
         </div>
         <div class="profile-proof">
-          <div class="proof-stage" role="img" aria-label="Perbandingan profil Arifqu. Gambar garis berubah menjadi foto berwarna. Nama, kampus, dan program studi menempati posisi yang sama pada kedua versi.">
+          <div class="proof-stage" role="img" aria-label="Poster profil Arifqu dalam tiga tahap: sketsa garis, cetakan tinta, dan foto berwarna.">
             <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
               <defs><filter id="portrait-etch" color-interpolation-filters="sRGB">
                 <feColorMatrix type="saturate" values="0"/>
@@ -3708,6 +3769,10 @@
               <div class="proof-type"><small>UNTAN · Pontianak</small><span class="proof-name">M. Arifqu<br>Wa Liin</span><small>Mahasiswa Sistem Informasi</small></div>
               <div class="proof-photo"><img src="assets/images/arifqu-portrait.jpg" alt="" width="676" height="892" loading="lazy"></div>
             </div>
+            <div class="proof-sheet proof-sheet--ink" aria-hidden="true">
+              <div class="proof-type"><small>UNTAN · Pontianak</small><span class="proof-name">M. Arifqu<br>Wa Liin</span><small>Mahasiswa Sistem Informasi</small></div>
+              <div class="proof-photo"><img src="assets/images/arifqu-ink.webp" alt="" width="676" height="892" loading="lazy"></div>
+            </div>
             <div class="proof-sheet proof-sheet--print" aria-hidden="true">
               <div class="proof-type"><small>UNTAN · Pontianak</small><span class="proof-name">M. Arifqu<br>Wa Liin</span><small>Mahasiswa Sistem Informasi</small></div>
               <div class="proof-photo"><img src="assets/images/arifqu-portrait.jpg" alt="" width="676" height="892" loading="lazy"></div>
@@ -3715,8 +3780,13 @@
             <span class="proof-seam" aria-hidden="true"></span>
             <svg class="proof-grip" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 6-4 4 4 4m6-8 4 4-4 4"/></svg>
           </div>
-          <div class="proof-toolbar">
-            <div class="proof-controls"><span>Sketsa</span><input id="proof-reveal" type="range" min="0" max="100" value="50" aria-valuetext="50 persen tampilan jadi"><span>Tampilan jadi</span></div>
+          <div class="proof-controls"><span aria-hidden="true">0%</span><input id="proof-reveal" type="range" min="0" max="100" value="50" aria-valuetext="Cetak"><span aria-hidden="true">100%</span></div>
+          <div class="proof-legend">
+            <div class="proof-stops" role="group" aria-label="Pilih tahap poster">
+              <button type="button" data-stop="0" aria-pressed="false">Sketsa</button>
+              <button type="button" data-stop="50" aria-pressed="true">Cetak</button>
+              <button type="button" data-stop="100" aria-pressed="false">Warna</button>
+            </div>
             <label class="proof-follow"><input type="checkbox" id="proof-follow" checked>Ikuti guliran</label>
           </div>
         </div>
@@ -3999,8 +4069,27 @@
 
       // Scope smooth scrolling to link activation so Tab always reveals focus immediately.
       document.addEventListener('click', function (event) {
-        if (!event.target.closest('a[href^="#"]') || event.defaultPrevented ||
+        var link = event.target.closest('a[href^="#"]');
+        if (!link || event.defaultPrevented || event.button !== 0 ||
             event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+        if (!isReduced() && document.startViewTransition && link.matches('.nav__link, .nav__logo, .socials a[href="#top"]')) {
+          var destination = document.getElementById(link.hash.slice(1));
+          var distance = destination && destination.getBoundingClientRect().top;
+          if (Math.abs(distance) > innerHeight) {
+            event.preventDefault();
+            var root = document.documentElement;
+            root.dataset.chapterJump = distance > 0 ? 'down' : 'up';
+            var transition = document.startViewTransition(function () {
+              if (location.hash !== link.hash) location.hash = link.hash;
+              destination.scrollIntoView({ behavior: 'instant', block: 'start' });
+              if (!destination.hasAttribute('tabindex')) destination.tabIndex = -1;
+              destination.focus({ preventScroll: true });
+              updateReadingPosition();
+            });
+            transition.finished.finally(function () { delete root.dataset.chapterJump; });
+            return;
+          }
+        }
         document.documentElement.classList.add('following-anchor');
         requestAnimationFrame(function () { document.documentElement.classList.remove('following-anchor'); });
       });
@@ -4200,26 +4289,63 @@
       var proofStage = proof.querySelector('.proof-stage');
       var proofRange = document.getElementById('proof-reveal');
       var proofFollow = document.getElementById('proof-follow');
+      var proofSection = document.getElementById('proses');
+      var proofWrap = proof.parentElement;
+      var proofStops = Array.from(proof.querySelectorAll('[data-stop]'));
+      var proofRun = 0;
+      function fitProofScene() {
+        var contentHeight = proofWrap.offsetHeight;
+        var top = parseFloat(getComputedStyle(proofSection).paddingTop);
+        var fits = !isReduced() && contentHeight + top + 16 <= innerHeight;
+        proofRun = fits ? innerHeight : 0;
+        proofSection.style.setProperty('--proof-foot', Math.max(0, innerHeight - top - contentHeight) + 'px');
+        proofSection.style.setProperty('--proof-run', proofRun + 'px');
+        proofSection.classList.toggle('can-pin', fits);
+        scheduleReadingPosition();
+      }
+      fitProofScene();
+      if ('ResizeObserver' in window) new ResizeObserver(fitProofScene).observe(proofWrap);
+      window.addEventListener('resize', fitProofScene);
+      motionPreference.addEventListener('change', fitProofScene);
       var postmark = document.querySelector('.postmark');
       var techWire = document.querySelector('.tech-wire');
       var techRoute = techWire.querySelector('path');
       var techEnd = techWire.querySelector('circle');
       var techStrip = document.querySelector('.stack-strip');
       var wireStartY = 0, wireEndY = 0;
-      proofFollow.addEventListener('change', scheduleReadingPosition);
+      proofFollow.addEventListener('change', function () {
+        proof.classList.remove('is-stepping');
+        scheduleReadingPosition();
+      });
 
       function revealProof(value) {
         var percent = Math.round(Math.min(100, Math.max(0, value)));
         if (proof.style.getPropertyValue('--reveal') === percent + '%') return;
         proof.style.setProperty('--reveal', percent + '%');
+        var ink = easedProgress(percent / 46);
+        var color = easedProgress((percent - 54) / 46);
+        proof.style.setProperty('--paper-cut', ((1 - ink) * 100).toFixed(2) + '%');
+        proof.style.setProperty('--color-cut', ((1 - color) * 100).toFixed(2) + '%');
+        proof.style.setProperty('--proof-zoom', (1.2 - .2 * easedProgress(percent / 100)).toFixed(4));
+        var nearest = proofStops[percent < 25 ? 0 : percent > 75 ? 2 : 1];
+        proofStops.forEach(function (stop) { stop.setAttribute('aria-pressed', String(stop === nearest)); });
         proofRange.value = percent;
-        proofRange.setAttribute('aria-valuetext', percent + ' persen tampilan jadi');
+        proofRange.setAttribute('aria-valuetext', nearest.textContent + ', ' + percent + ' persen');
       }
+      proofStops.forEach(function (stop) {
+        stop.addEventListener('click', function () {
+          proofFollow.checked = false;
+          proof.classList.add('is-stepping');
+          revealProof(Number(stop.dataset.stop));
+        });
+      });
       proofRange.addEventListener('input', function () {
+        proof.classList.remove('is-stepping');
         proofFollow.checked = false;
         revealProof(proofRange.valueAsNumber);
       });
       function scrubProof(event) {
+        proof.classList.remove('is-stepping');
         var bounds = proofStage.getBoundingClientRect();
         proofFollow.checked = false;
         revealProof(100 * (event.clientX - bounds.left) / bounds.width);
@@ -4269,10 +4395,12 @@
       });
       proofStage.addEventListener('dragstart', function (event) { event.preventDefault(); });
 
-      function updateProof(bounds, viewport, reduced) {
+      function updateProof(bounds, sectionTop, viewport, reduced) {
         if (!proofFollow.checked || bounds.bottom < 0 || bounds.top > viewport) return;
         var center = bounds.top + bounds.height / 2;
-        var progress = easedProgress((viewport * .92 - center) / (viewport * .65));
+        var progress = proofRun && !reduced
+          ? Math.max(0, Math.min(1, -sectionTop / proofRun))
+          : easedProgress((viewport * .92 - center) / (viewport * .65));
         revealProof(reduced ? 50 : progress * 100);
         if (!reduced) {
           proof.style.setProperty('--seam-y', (20 + 60 * progress).toFixed(1) + '%');
@@ -4323,7 +4451,7 @@
           });
           updatePostmark(stampBounds, height);
         }
-        updateProof(proofBounds, height, reduced);
+        updateProof(proofBounds, sections[targets.indexOf(proofSection)].top, height, reduced);
         progressLine.style.transform = 'scaleX(' + (maxY ? y / maxY : 0) + ')';
         header.classList.toggle('is-scrolled', y > 24);
 
@@ -4440,7 +4568,7 @@
       }
 
       motionPreference.addEventListener('change', scheduleReadingPosition);
-      new MutationObserver(scheduleReadingPosition).observe(document.documentElement, {
+      new MutationObserver(fitProofScene).observe(document.documentElement, {
         attributes: true, attributeFilter: ['data-motion']
       });
 
