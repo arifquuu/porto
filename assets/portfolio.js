@@ -52,8 +52,11 @@ function glideViewerPick(fromEl, toEl) {
 }
 
 function showPlate(name, captureProgress = false) {
-  const prevPick = picks.find(button => button.getAttribute('aria-pressed') === 'true');
-  const nextPick = picks.find(button => button.dataset.plate === name);
+  const prevIndex = picks.findIndex(button => button.getAttribute('aria-pressed') === 'true');
+  const nextIndex = picks.findIndex(button => button.dataset.plate === name);
+  const prevPick = picks[prevIndex];
+  const nextPick = picks[nextIndex];
+  stage.dataset.slideDir = prevIndex !== -1 && nextIndex < prevIndex ? 'prev' : 'next';
   if (viewer.open && prevPick && nextPick && prevPick !== nextPick) {
     glideViewerPick(prevPick, nextPick);
   }

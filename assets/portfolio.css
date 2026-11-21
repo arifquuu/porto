@@ -1,6 +1,21 @@
 .portrait-sketch { display: none; }
 @media (max-width: 1023px) {
-  .nav.is-open .nav__links { gap: 0; }
+  .nav.is-open .nav__links {
+    gap: 0;
+    top: calc(var(--nav) + 4px);
+    left: var(--gut);
+    right: var(--gut);
+    bottom: 16px;
+    border-radius: 24px;
+    border: 1px solid var(--line-strong);
+    background: color-mix(in oklab, var(--p-paper-hi) 96%, var(--p-surface));
+    box-shadow: 0 24px 60px -20px rgba(12, 18, 32, 0.36);
+    padding: var(--s-4) var(--s-5);
+  }
+  html[data-theme="dark"] .nav.is-open .nav__links {
+    background: color-mix(in oklab, #0e1d42 96%, #142754);
+    box-shadow: 0 24px 60px -18px rgba(2, 6, 18, 0.78);
+  }
   .nav.is-open .nav__link {
     display: flex; justify-content: space-between; flex-shrink: 0;
     height: clamp(51px, 9svh, 80px); border-bottom: 1px solid var(--line-strong);
@@ -233,10 +248,18 @@ html:has(dialog[open].photo-viewer, dialog[open].manual-copy) { overflow: hidden
     transform: scale(1.12);
   }
   html:not([data-motion="off"]) .photo-viewer[open] { animation: viewer-open 240ms cubic-bezier(.2,.76,.24,1) both; }
-  html:not([data-motion="off"]) .viewer-stage > * { animation: viewer-plate 340ms cubic-bezier(.22,.8,.22,1) both; }
+  html:not([data-motion="off"]) .viewer-stage > * { animation: viewer-plate-next 340ms cubic-bezier(.22,.8,.22,1) both; }
+  html:not([data-motion="off"]) .viewer-stage[data-slide-dir="prev"] > * { animation-name: viewer-plate-prev; }
   html:not([data-motion="off"]) .photo-open::before { transition: scale 180ms ease; }
   html:not([data-motion="off"]) .photo-open:hover::before { scale: 1.16; }
 }
 @keyframes copied-line { from { background-color: #9ee6cf36; } to { background-color: transparent; } }
 @keyframes viewer-open { from { opacity: 0; transform: translateY(12px); } }
-@keyframes viewer-plate { from { clip-path: inset(0 0 12%); opacity: .6; scale: 1.015; } to { clip-path: inset(0); opacity: 1; scale: 1; } }
+@keyframes viewer-plate-next {
+  from { clip-path: inset(0 0 8%); opacity: .55; translate: 22px 0; scale: 1.015; }
+  to { clip-path: inset(0); opacity: 1; translate: 0 0; scale: 1; }
+}
+@keyframes viewer-plate-prev {
+  from { clip-path: inset(0 0 8%); opacity: .55; translate: -22px 0; scale: 1.015; }
+  to { clip-path: inset(0); opacity: 1; translate: 0 0; scale: 1; }
+}
