@@ -306,11 +306,12 @@
         content: ""; position: absolute; inset: 0 0 auto auto; pointer-events: none;
         width: min(82%, 760px); height: clamp(22px, 3vw, 44px); border-bottom-left-radius: 100% 100%;
         background: linear-gradient(175deg, #8b796329, #f6ecd6 48%, #d1bda1 67%, #897661 100%);
-        box-shadow: 0 3px 9px -4px #48341b80; transform-origin: top right;
+        box-shadow: 0 3px 9px -4px rgba(18, 22, 28, 0.34); transform-origin: top right;
         transform: scale(var(--fold-width, 0), var(--fold-depth, 0));
       }
       html[data-theme="dark"]:not([data-motion="off"]) :is(#proses, #github, #kontak)::after {
         background: linear-gradient(175deg, #203141, #465563 48%, #5f6a70 67%, #28384a);
+        box-shadow: 0 4px 12px -4px rgba(3, 8, 22, 0.72);
       }
     }
 
@@ -1806,9 +1807,11 @@
     }
     .proof-sheet--ink .proof-photo { background: #ddbaa0; }
     .proof-sheet--ink .proof-photo img { mix-blend-mode: multiply; }
-    .proof-sheet--print { color: #192b38; background: #ede9df; clip-path: inset(0 var(--color-cut) 0 0); }
+    .proof-sheet--print { color: #192b38; background: #ede9df; clip-path: inset(0 var(--color-cut) 0 0); box-shadow: inset -1.5px 0 0 #dac6a3; }
     @media (prefers-reduced-motion: no-preference) {
       html:not([data-motion="off"]) .profile-proof.is-stepping .proof-sheet { transition: clip-path 480ms cubic-bezier(.22, 1, .36, 1); }
+      html:not([data-motion="off"]) .profile-proof.is-stepping .proof-stops::after { transition: translate 480ms cubic-bezier(.22, 1, .36, 1); }
+      html:not([data-motion="off"]) .profile-proof.is-stepping :is(.proof-seam, .proof-grip) { transition: left 480ms cubic-bezier(.22, 1, .36, 1), transform 200ms cubic-bezier(.22, 1, .36, 1); }
     }
     .proof-stops {
       position: relative; display: inline-grid; grid-template-columns: repeat(3, 1fr);
@@ -4757,7 +4760,8 @@
 
       var gridRange = document.getElementById('grid-span');
       var gridExample = document.getElementById('grid-example');
-      function updateGrid() {
+      var htmlCodeLines = document.querySelectorAll('#stack-info-html .code-ln');
+      function updateGrid(fromUser) {
         var left = gridRange.valueAsNumber;
         var right = 12 - left;
         gridExample.style.setProperty('--left-span', left);
@@ -4768,25 +4772,33 @@
         document.getElementById('code-right').textContent = right;
         document.getElementById('grid-value').textContent = left + ' dari 12 kolom';
         gridRange.setAttribute('aria-valuetext', left + ' kolom kiri, ' + right + ' kolom kanan');
+        if (fromUser && htmlCodeLines.length >= 4) {
+          pulseAnim(htmlCodeLines[2], 'is-executing');
+          pulseAnim(htmlCodeLines[3], 'is-executing');
+        }
       }
-      gridRange.addEventListener('input', updateGrid);
-      updateGrid();
+      gridRange.addEventListener('input', function () { updateGrid(true); });
+      updateGrid(false);
 
       var trimName = document.getElementById('trim-name');
       var trimResult = document.getElementById('trim-result');
-      function updateTrim() {
+      var phpCodeLine = document.querySelector('#stack-info-php .code-ln');
+      function updateTrim(fromUser) {
         // Match PHP trim()'s default character list, including internal spaces verbatim.
         trimResult.value = JSON.stringify(trimName.value.replace(/^[ \t\r\n\x00\x0B]+|[ \t\r\n\x00\x0B]+$/g, ''));
+        if (fromUser && phpCodeLine) pulseAnim(phpCodeLine, 'is-executing');
       }
-      trimName.addEventListener('input', updateTrim);
-      updateTrim();
+      trimName.addEventListener('input', function () { updateTrim(true); });
+      updateTrim(false);
 
       var demoButton = document.getElementById('contoh-tombol');
       var demoStatus = document.getElementById('contoh-status');
+      var jsCodeLine = document.querySelectorAll('#stack-info-js .code-ln')[2];
       demoButton.addEventListener('click', function () {
         var pressed = demoButton.getAttribute('aria-pressed') !== 'true';
         demoButton.setAttribute('aria-pressed', String(pressed));
         demoStatus.value = String(pressed);
+        if (jsCodeLine) pulseAnim(jsCodeLine, 'is-executing');
       });
 
       function setRadioState(button, checked) {
@@ -4833,6 +4845,7 @@
       var webBarA = document.getElementById('web-bar-a');
       var webBarB = document.getElementById('web-bar-b');
       var widthSlider = document.getElementById('sim-width');
+      var simScale = widthSlider.closest('.sim-scale');
       var widthStops = document.querySelectorAll('.breakpoint-tools button');
       var layoutButtons = document.querySelectorAll('[data-layout-mode]');
       var previewAside = webSimBox.querySelector('.web-sim__aside');
@@ -4863,6 +4876,7 @@
         webBarB.style.setProperty('--fill', (width / max * 100) + '%');
 
         if (canvasWeb.dataset.mode === mode) return;
+        if (simScale) pulseAnim(simScale, 'is-crossing');
         canvasWeb.dataset.mode = mode;
         webSimBox.dataset.mode = mode;
         layoutButtons.forEach(function (btn) {

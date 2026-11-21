@@ -22,7 +22,41 @@ function makePlate(name) {
   return artwork;
 }
 
+function isReducedMotion() {
+  return (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    || document.documentElement.getAttribute('data-motion') === 'off';
+}
+
+function glideViewerPick(fromEl, toEl) {
+  if (!fromEl || !toEl || fromEl === toEl || isReducedMotion() || !Element.prototype.animate) return;
+  const container = toEl.parentElement;
+  if (!container) return;
+  const cr = container.getBoundingClientRect();
+  const a = fromEl.getBoundingClientRect();
+  const b = toEl.getBoundingClientRect();
+  if (!a.width || !b.width || !cr.width) return;
+  const pill = document.createElement('span');
+  pill.className = 'viewer-glide';
+  pill.setAttribute('aria-hidden', 'true');
+  pill.style.width = a.width + 'px';
+  pill.style.height = a.height + 'px';
+  pill.style.transform = 'translate3d(' + (a.left - cr.left) + 'px,' + (a.top - cr.top) + 'px,0)';
+  container.appendChild(pill);
+  const anim = pill.animate([
+    { width: a.width + 'px', height: a.height + 'px', transform: 'translate3d(' + (a.left - cr.left) + 'px,' + (a.top - cr.top) + 'px,0)', opacity: 0.45 },
+    { width: b.width + 'px', height: b.height + 'px', transform: 'translate3d(' + (b.left - cr.left) + 'px,' + (b.top - cr.top) + 'px,0)', opacity: 0 }
+  ], { duration: 260, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+  const cleanup = () => { if (pill.parentNode) pill.parentNode.removeChild(pill); };
+  anim.onfinish = cleanup;
+  anim.oncancel = cleanup;
+}
+
 function showPlate(name, captureProgress = false) {
+  const prevPick = picks.find(button => button.getAttribute('aria-pressed') === 'true');
+  const nextPick = picks.find(button => button.dataset.plate === name);
+  if (viewer.open && prevPick && nextPick && prevPick !== nextPick) {
+    glideViewerPick(prevPick, nextPick);
+  }
   let title = titles[name];
   if (captureProgress) {
     const proof = document.querySelector('.profile-proof');
@@ -47,6 +81,26 @@ function showPlate(name, captureProgress = false) {
   }
   viewer.querySelector('h2').textContent = title;
   picks.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.plate === name)));
+}
+
+if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  stage.addEventListener('pointermove', event => {
+    if (isReducedMotion()) return;
+    const r = stage.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const px = Math.max(0, Math.min(1, (event.clientX - r.left) / r.width));
+    const py = Math.max(0, Math.min(1, (event.clientY - r.top) / r.height));
+    stage.style.setProperty('--v-x', (px * 100).toFixed(1) + '%');
+    stage.style.setProperty('--v-y', (py * 100).toFixed(1) + '%');
+    stage.style.setProperty('--v-pan-x', ((0.5 - px) * 7).toFixed(2) + 'px');
+    stage.style.setProperty('--v-pan-y', ((0.5 - py) * 5).toFixed(2) + 'px');
+    stage.classList.add('is-lit');
+  }, { passive: true });
+  stage.addEventListener('pointerleave', () => {
+    stage.classList.remove('is-lit');
+    stage.style.setProperty('--v-pan-x', '0px');
+    stage.style.setProperty('--v-pan-y', '0px');
+  }, { passive: true });
 }
 
 if (typeof viewer.showModal === 'function') {

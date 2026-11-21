@@ -89,18 +89,39 @@ html:has(dialog[open].photo-viewer, dialog[open].manual-copy) { overflow: hidden
 .viewer-stage {
   position: relative; isolation: isolate; container-type: inline-size;
   overflow: hidden; display: grid; place-items: center; background: #0d1414;
+  --v-x: 50%; --v-y: 50%; --v-pan-x: 0px; --v-pan-y: 0px;
 }
+.viewer-stage::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  opacity: 0;
+  background: radial-gradient(420px circle at var(--v-x) var(--v-y), rgba(255, 244, 222, 0.14), transparent 68%);
+  transition: opacity 240ms ease;
+}
+.viewer-stage.is-lit::after { opacity: 1; }
 .viewer-stage > img { display: block; width: 100%; height: 100%; object-fit: contain; min-height: 0; }
 .viewer-stage .proof-sheet, .viewer-proof { width: 100%; height: 100%; }
 .viewer-proof { position: relative; }
 .viewer-stage > .proof-sheet { clip-path: none; }
 .viewer-stage > .proof-sheet .proof-photo img { scale: 1; }
-.viewer-picks { display: flex; justify-content: center; gap: clamp(4px, 1vw, 12px); }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .viewer-stage.is-lit > * {
+    transform: translate3d(var(--v-pan-x), var(--v-pan-y), 0);
+    transition: transform 160ms cubic-bezier(.22, 1, .36, 1);
+  }
+}
+.viewer-picks { position: relative; display: flex; justify-content: center; gap: clamp(4px, 1vw, 12px); }
+.viewer-glide {
+  position: absolute; left: 0; top: 0; pointer-events: none; z-index: 0;
+  border-radius: 2px; background: rgba(238, 233, 222, 0.34); will-change: transform;
+}
 .viewer-picks button {
+  position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 4px 10px; min-height: 46px; border: 1px solid #62716b; border-radius: 2px;
   font: 500 14px var(--font-text); color: #f4f0e8; background: transparent; cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 120ms ease;
 }
+.viewer-picks button:active { transform: scale(0.96); }
 .viewer-picks button::before {
   content: ""; width: 24px; height: 32px;
   background: url(images/arifqu-portrait.jpg) 50% 30% / cover;
@@ -132,6 +153,17 @@ html:has(dialog[open].photo-viewer, dialog[open].manual-copy) { overflow: hidden
 }
 .sim-scale::after {
   left: calc(8px + (100% - 16px) * .42472); width: 2px; height: 8px; background: #f2ce91;
+  transform-origin: center bottom;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .sim-scale.is-crossing::after {
+    animation: threshold-pulse 420ms cubic-bezier(.22, 1, .36, 1);
+  }
+}
+@keyframes threshold-pulse {
+  0% { transform: scaleY(1); }
+  45% { transform: scaleY(1.85) scaleX(1.6); background: #fff1d8; }
+  100% { transform: scaleY(1); }
 }
 .breakpoint-tools button {
   display: inline-flex; align-items: center; gap: 5px;
@@ -183,15 +215,28 @@ html:has(dialog[open].photo-viewer, dialog[open].manual-copy) { overflow: hidden
   .code-box:has([data-copied]) .code-ln:nth-child(2) { animation-delay: 45ms; }
   .code-box:has([data-copied]) .code-ln:nth-child(3) { animation-delay: 90ms; }
   .code-box:has([data-copied]) .code-ln:nth-child(4) { animation-delay: 135ms; }
+  html:not([data-motion="off"]) .code-ln.is-executing {
+    animation: copied-line 380ms cubic-bezier(.22, 1, .36, 1);
+  }
   html:not([data-motion="off"]) .mail-actions:has(.draft-copy[data-copied]) .postmark__seal {
     animation: postmark-press 420ms cubic-bezier(.22,1,.36,1);
   }
-  html:not([data-motion="off"]) .mail-draft::before { transform: scaleX(var(--ch-enter, 1)); }
+  html:not([data-motion="off"]) .mail-draft::before {
+    transform: scaleX(var(--ch-enter, 1));
+    transition: filter 240ms ease;
+  }
+  html:not([data-motion="off"]) .mail-draft::after {
+    transform-origin: top right;
+    transition: transform 240ms cubic-bezier(.22, 1, .36, 1);
+  }
+  html:not([data-motion="off"]) .mail-draft:focus-within::after {
+    transform: scale(1.12);
+  }
   html:not([data-motion="off"]) .photo-viewer[open] { animation: viewer-open 240ms cubic-bezier(.2,.76,.24,1) both; }
-  html:not([data-motion="off"]) .viewer-stage > * { animation: viewer-plate 320ms cubic-bezier(.22,.8,.22,1) both; }
+  html:not([data-motion="off"]) .viewer-stage > * { animation: viewer-plate 340ms cubic-bezier(.22,.8,.22,1) both; }
   html:not([data-motion="off"]) .photo-open::before { transition: scale 180ms ease; }
   html:not([data-motion="off"]) .photo-open:hover::before { scale: 1.16; }
 }
 @keyframes copied-line { from { background-color: #9ee6cf36; } to { background-color: transparent; } }
 @keyframes viewer-open { from { opacity: 0; transform: translateY(12px); } }
-@keyframes viewer-plate { from { clip-path: inset(0 0 12%); opacity: .6; } to { clip-path: inset(0); opacity: 1; } }
+@keyframes viewer-plate { from { clip-path: inset(0 0 12%); opacity: .6; scale: 1.015; } to { clip-path: inset(0); opacity: 1; scale: 1; } }
