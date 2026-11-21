@@ -1652,16 +1652,39 @@
       background-size: 23px 23px;
     }
     .proof-sheet--print { color: #192b38; background: #ede9df; clip-path: inset(0 calc(100% - var(--reveal)) 0 0); }
+    html[data-theme="dark"] .proof-sheet--print { color: var(--p-ink); background: var(--p-paper-hi); }
+    html[data-theme="dark"] .proof-sheet--drawing {
+      color: #c6dcd9;
+      background-color: #18303c;
+      background-image: linear-gradient(#a1c6c720 1px, transparent 1px), linear-gradient(90deg,#a1c6c720 1px, transparent 1px);
+    }
     .proof-type { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; min-width: 0; border-block: 1px solid currentColor; padding-block: clamp(8px,1.1cqw,18px); }
     .proof-type small { font: 500 clamp(10px,1.1cqw,15px)/1.35 var(--font-mono); }
     .proof-name { font: 500 clamp(28px,6.8cqw,100px)/.97 var(--font-display); letter-spacing: -.06em; }
     .proof-sheet--drawing .proof-name { color: transparent; -webkit-text-stroke: 1px #294a57; }
+    html[data-theme="dark"] .proof-sheet--drawing .proof-name { -webkit-text-stroke-color: #c6dcd9; }
     .proof-photo { position: relative; min-height: 0; overflow: hidden; }
     .proof-photo img { display: block; width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; object-position: 50% 35%; }
     .proof-sheet--drawing .proof-photo { outline: 1px solid #7195a2; }
     .proof-sheet--drawing img { filter: url(#portrait-etch); }
     .proof-sheet--drawing .proof-photo::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 22px, #9bbec025 22px 23px); }
     .proof-seam { position: absolute; top: 0; bottom: 0; left: var(--reveal); width: 1px; background: #e2c79d; pointer-events: none; }
+    .proof-grip {
+      position: absolute; left: clamp(17px, var(--reveal), calc(100% - 17px)); top: 78%;
+      translate: -50% -50%; width: 32px; height: 32px; padding: 6px;
+      border: 1px solid #67706d; border-radius: 50%; pointer-events: none;
+      background: #faf8f3; color: #273b42; box-shadow: 0 2px 6px #10252b33;
+    }
+    .proof-follow { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; justify-self: end; cursor: pointer; white-space: nowrap; }
+    .proof-follow input { accent-color: var(--p-accent); width: 17px; height: 17px; }
+    .proof-toolbar { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; column-gap: 32px; font-size: 14px; }
+    @media (max-width: 639px) {
+      .proof-toolbar { grid-template-columns: 1fr; }
+      body:has(.nav__link[href="#proses"][aria-current="page"]) > nav.actionbar { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .proof-follow { display: none; } .proof-toolbar { grid-template-columns: 1fr; } }
+    html[data-motion="off"] .proof-follow { display: none; }
+    html[data-motion="off"] .proof-toolbar { grid-template-columns: 1fr; }
     .proof-controls { display: grid; grid-template-columns: auto minmax(60px,1fr) auto; gap: clamp(10px,2vw,28px); align-items: center; font: 500 14px/1.4 var(--font-text); }
     .proof-controls input { width: 100%; height: 44px; margin: 0; appearance: none; background: transparent; cursor: ew-resize; }
     .proof-controls input::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, var(--ink) var(--reveal), var(--line-strong) var(--reveal)); }
@@ -1671,9 +1694,9 @@
     .proof-controls input::-moz-range-thumb { width: 10px; height: 10px; background: var(--p-paper-hi); border: 2px solid var(--ink); border-radius: 50%; }
     .proof-controls input:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 1px; }
     @media (min-width: 640px) {
-      .proof-sheet { padding: 0; }
-      .proof-type { border: 0; padding: clamp(24px, 4.3cqw, 58px) 0 clamp(24px, 4.3cqw, 58px) clamp(24px, 4.3cqw, 58px); }
-      .proof-type small { border-top: 1px solid currentColor; padding-top: 10px; }
+      .proof-sheet { padding: clamp(24px, 4.3cqw, 58px) 0; }
+      .proof-type { border: 0; padding: 0 0 0 clamp(24px, 4.3cqw, 58px); }
+      .proof-type small { border-top: 1px solid currentColor; padding-top: 5px; }
     }
     @media (max-width: 639px) {
       .proof-heading { grid-template-columns: 1fr; }
@@ -2170,8 +2193,13 @@
     }
 
     .contact-head__intro .lead {
-      color: var(--ink);
+      color: var(--p-ink);
       text-wrap: pretty;
+    }
+    @media (max-width: 639px) {
+      footer.closing.ground-surface, html[data-theme="dark"] footer.closing.ground-surface {
+        background: var(--p-surface);
+      }
     }
 
     .topic-picker {
@@ -3460,7 +3488,7 @@
           <label for="proof-reveal">Gulir atau geser pembatas untuk membandingkan rancangan dan tampilan profil saya.</label>
         </div>
         <div class="profile-proof">
-          <div class="proof-stage" role="img" aria-label="Perbandingan komposisi profil Arifqu. Sketsa bergaris menampilkan posisi nama dan potret. Versi jadi memakai tipografi gelap dan foto berwarna di atas kertas krem.">
+          <div class="proof-stage" role="img" aria-label="Perbandingan profil Arifqu. Gambar garis berubah menjadi foto berwarna. Nama, kampus, dan program studi menempati posisi yang sama pada kedua versi.">
             <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
               <defs><filter id="portrait-etch" color-interpolation-filters="sRGB">
                 <feColorMatrix type="saturate" values="0"/>
@@ -3481,8 +3509,12 @@
               <div class="proof-photo"><img src="assets/images/arifqu-portrait.jpg" alt="" width="676" height="892" loading="lazy"></div>
             </div>
             <span class="proof-seam" aria-hidden="true"></span>
+            <svg class="proof-grip" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 6-4 4 4 4m6-8 4 4-4 4"/></svg>
           </div>
-          <div class="proof-controls"><span>Sketsa</span><input id="proof-reveal" type="range" min="0" max="100" value="50" aria-valuetext="50 persen tampilan jadi"><span>Tampilan jadi</span></div>
+          <div class="proof-toolbar">
+            <div class="proof-controls"><span>Sketsa</span><input id="proof-reveal" type="range" min="0" max="100" value="50" aria-valuetext="50 persen tampilan jadi"><span>Tampilan jadi</span></div>
+            <label class="proof-follow"><input type="checkbox" id="proof-follow" checked>Ikuti guliran</label>
+          </div>
         </div>
       </div>
     </section>
@@ -3903,7 +3935,8 @@
       var proof = document.querySelector('.profile-proof');
       var proofStage = proof.querySelector('.proof-stage');
       var proofRange = document.getElementById('proof-reveal');
-      var manualProof = false;
+      var proofFollow = document.getElementById('proof-follow');
+      proofFollow.addEventListener('change', scheduleReadingPosition);
 
       function revealProof(value) {
         var percent = Math.round(Math.min(100, Math.max(0, value)));
@@ -3913,12 +3946,12 @@
         proofRange.setAttribute('aria-valuetext', percent + ' persen tampilan jadi');
       }
       proofRange.addEventListener('input', function () {
-        manualProof = true;
+        proofFollow.checked = false;
         revealProof(proofRange.valueAsNumber);
       });
       function scrubProof(event) {
         var bounds = proofStage.getBoundingClientRect();
-        manualProof = true;
+        proofFollow.checked = false;
         revealProof(100 * (event.clientX - bounds.left) / bounds.width);
       }
       var proofPointer = null;
@@ -3952,11 +3985,7 @@
       function updateProof() {
         var bounds = proofStage.getBoundingClientRect();
         var viewport = window.innerHeight;
-        if (bounds.bottom < 0 || bounds.top > viewport) {
-          manualProof = false;
-          return;
-        }
-        if (manualProof) return;
+        if (!proofFollow.checked || bounds.bottom < 0 || bounds.top > viewport) return;
         var center = bounds.top + bounds.height / 2;
         var progress = easedProgress((viewport * .92 - center) / (viewport * .65));
         revealProof(isReduced() ? 50 : progress * 100);
