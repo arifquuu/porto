@@ -274,13 +274,30 @@
         transform-origin: left;
         transform: scaleX(calc(0.18 + 0.82 * var(--ch-enter, 1)));
       }
-      html:not([data-motion="off"]) :is(.kuliah-intro__head, .proof-heading, .gh-head__copy, .contact-head__intro) {
-        transform: translate3d(calc((1 - var(--ch-enter, 1)) * -14px), calc((1 - var(--ch-enter, 1)) * 14px), 0);
-        will-change: transform;
+      html:not([data-motion="off"]) .title-ink {
+        display: inline-block;
+        transform: translateY(clamp(0em, calc((1 - var(--ch-enter, 1)) * 1em - var(--lead-in)), .65em));
       }
-      html:not([data-motion="off"]) :is(.wb-stage, .mail-draft) {
-        transform: translate3d(calc((1 - var(--ch-enter, 1)) * 16px), 0, 0);
-        will-change: transform;
+      html:not([data-motion="off"]) .wb-stage {
+        transform: translateY(calc((1 - var(--ch-enter, 1)) * 12px));
+      }
+      html:not([data-motion="off"]) .mail-draft {
+        transform: scaleX(calc(.985 + .015 * var(--ch-enter, 1)));
+        transform-origin: left center;
+      }
+    }
+    :is(#proses, #github, #kontak) { position: relative; }
+    .portrait-print { display: none; }
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) :is(#proses, #github, #kontak)::after {
+        content: ""; position: absolute; inset: 0 0 auto auto; pointer-events: none;
+        width: min(82%, 760px); height: clamp(22px, 3vw, 44px); border-bottom-left-radius: 100% 100%;
+        background: linear-gradient(175deg, #8b796329, #f6ecd6 48%, #d1bda1 67%, #897661 100%);
+        box-shadow: 0 3px 9px -4px #48341b80; transform-origin: top right;
+        transform: scale(var(--fold-width, 0), var(--fold-depth, 0));
+      }
+      html[data-theme="dark"]:not([data-motion="off"]) :is(#proses, #github, #kontak)::after {
+        background: linear-gradient(175deg, #203141, #465563 48%, #5f6a70 67%, #28384a);
       }
     }
 
@@ -708,7 +725,7 @@
       opacity: 1;
     }
 
-    .hero__media > img {
+    .hero__media > :is(img, .portrait-print) {
       border-radius: var(--r-sm);
       border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
       transform-origin: center 36%;
@@ -716,13 +733,18 @@
       will-change: transform;
     }
 
-    .hero__media.is-lit > img {
+    .hero__media.is-lit > :is(img, .portrait-print) {
       transition: transform 140ms cubic-bezier(.22, 1, .36, 1), filter 900ms cubic-bezier(.22, 1, .36, 1);
     }
 
     @media (prefers-reduced-motion: no-preference) {
-      html:not([data-motion="off"]) .hero__media > img {
+      html:not([data-motion="off"]) .hero__media > :is(img, .portrait-print) {
         scale: calc(1 + .09 * var(--portrait-travel, 0));
+      }
+      html:not([data-motion="off"]) .portrait-print {
+        display: block; position: absolute; inset: 0; width: 100%; height: 100%;
+        background: url("assets/images/arifqu-ink.webp") var(--ly-pos) / cover no-repeat content-box; pointer-events: none;
+        clip-path: polygon(0 var(--ink-left, 101%), 100% var(--ink-right, 101%), 100% 100%, 0 100%);
       }
       html:not([data-motion="off"]) .portrait-mat {
         position: absolute; inset: 0; z-index: 3; pointer-events: none;
@@ -734,9 +756,12 @@
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .hero__media:hover > img {
+      .hero__media:hover > :is(img, .portrait-print) {
         transform: translate3d(var(--img-x), var(--img-y), 0) scale(1.024);
       }
+    }
+    @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) .portrait-print { background-position: var(--ly-pos-phone); }
     }
 
     .hero__top h1 { color: var(--p-inv-bg); }
@@ -3383,6 +3408,7 @@
           </div>
           <div class="hero__media span-6 start-7" id="hero-portrait-frame">
             <img src="assets/images/arifqu-portrait.jpg" width="676" height="892" alt="Potret M. Arifqu Wa Liin mengenakan kemeja batik indigo" fetchpriority="high" decoding="async">
+            <span class="portrait-print" aria-hidden="true"></span>
             <span class="portrait-mat" aria-hidden="true"></span>
           </div>
         </div>
@@ -4131,6 +4157,22 @@
       var header = document.querySelector('header.nav');
       var links = Array.prototype.slice.call(document.querySelectorAll('.nav__links .nav__link[href^="#"]'));
       var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+      targets.slice(1).forEach(function (section) {
+        var title = section.querySelector('h2');
+        var name = title.textContent.trim();
+        var words = name.split(/\s+/);
+        title.setAttribute('aria-label', name);
+        title.replaceChildren();
+        words.forEach(function (word, index) {
+          var ink = document.createElement('span');
+          ink.setAttribute('aria-hidden', 'true');
+          ink.className = 'title-ink';
+          ink.style.setProperty('--lead-in', (.05 + .4 * (1 - index / Math.max(1, words.length - 1))) + 'em');
+          ink.textContent = word;
+          if (index) title.append(' ');
+          title.appendChild(ink);
+        });
+      });
       var mobileLocation = matchMedia('(max-width: 639px)');
       var locationTrack = document.createElement('span');
       locationTrack.className = 'nav-location__track';
@@ -4227,62 +4269,77 @@
       });
       proofStage.addEventListener('dragstart', function (event) { event.preventDefault(); });
 
-      function updateProof() {
-        var bounds = proofStage.getBoundingClientRect();
-        var viewport = window.innerHeight;
+      function updateProof(bounds, viewport, reduced) {
         if (!proofFollow.checked || bounds.bottom < 0 || bounds.top > viewport) return;
         var center = bounds.top + bounds.height / 2;
         var progress = easedProgress((viewport * .92 - center) / (viewport * .65));
-        revealProof(isReduced() ? 50 : progress * 100);
-        if (!isReduced()) {
+        revealProof(reduced ? 50 : progress * 100);
+        if (!reduced) {
           proof.style.setProperty('--seam-y', (20 + 60 * progress).toFixed(1) + '%');
         }
       }
 
       function updateReadingPosition() {
         pendingScrollFrame = 0;
-        var maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var height = window.innerHeight;
+        var maxY = Math.max(0, document.documentElement.scrollHeight - height);
         var y = Math.min(maxY, Math.max(0, window.scrollY));
-        if (!isReduced()) {
+        var reduced = isReduced();
+        // Read geometry together before any of the scroll effects update styles.
+        var sections = targets.map(function (section) { return section.getBoundingClientRect(); });
+        var proofBounds = proofStage.getBoundingClientRect();
+        if (!reduced) {
           var portraitBottom = portraitFrame.getBoundingClientRect().bottom;
-          if (portraitBottom > 0) {
-            var travel = easedProgress(y / Math.max(1, portraitBottom + y - header.offsetHeight));
-            portraitFrame.style.setProperty('--portrait-travel', travel.toFixed(4));
-          }
           var wireTop = techWire.getBoundingClientRect().top;
-          var height = window.innerHeight;
+          var stampBounds = postmark.getBoundingClientRect();
+          var headerHeight = header.offsetHeight;
+          var margin = Math.min(36, window.innerWidth * .035);
+          if (portraitBottom > 0) {
+            var portraitTravel = y / Math.max(1, portraitBottom + y - headerHeight);
+            var travel = easedProgress(portraitTravel);
+            portraitFrame.style.setProperty('--portrait-travel', travel.toFixed(4));
+            var plate = easedProgress(portraitTravel / .62);
+            portraitFrame.style.setProperty('--ink-left', (119 - 142 * plate).toFixed(2) + '%');
+            portraitFrame.style.setProperty('--ink-right', (101 - 142 * plate).toFixed(2) + '%');
+          }
           if (wireTop + wireEndY >= 0 && wireTop + wireStartY <= height) {
             var ink = easedProgress((height * .93 - wireTop - wireStartY) / (height * .32 + wireEndY - wireStartY));
             techWire.style.setProperty('--wire-ink', ink.toFixed(4));
           }
           targets.forEach(function (sec, idx) {
             if (!idx) return;
-            var sb = sec.getBoundingClientRect();
+            var sb = sections[idx];
             if (sb.top <= height * 1.05 && sb.bottom >= -40) {
               var chEnter = easedProgress((height * 0.96 - sb.top) / (height * 0.36));
               sec.style.setProperty('--ch-enter', chEnter.toFixed(3));
+              if (sec === studySection) {
+                updateChapterTransition(sb, height, headerHeight, margin);
+              } else {
+                var turn = easedProgress((height - sb.top) / (height * .61));
+                sec.style.setProperty('--fold-depth', Math.sin(turn * Math.PI).toFixed(4));
+                sec.style.setProperty('--fold-width', (.28 + .72 * turn).toFixed(4));
+              }
             }
           });
+          updatePostmark(stampBounds, height);
         }
-        updateChapterTransition();
-        updateProof();
-        updatePostmark();
+        updateProof(proofBounds, height, reduced);
         progressLine.style.transform = 'scaleX(' + (maxY ? y / maxY : 0) + ')';
         header.classList.toggle('is-scrolled', y > 24);
 
-        var readingLine = y + window.innerHeight * 0.4;
-        var blendDistance = window.innerHeight * .14;
+        var readingLine = height * .4;
+        var blendDistance = height * .14;
         var place = 0;
         var current = targets[0];
         targets.forEach(function (section, index) {
-          var distance = readingLine - section.offsetTop;
+          var distance = readingLine - sections[index].top;
           if (distance >= 0) current = section;
           if (index) {
             place += easedProgress(.5 + distance / blendDistance);
           }
         });
         if (y >= maxY - 1 && maxY > 0) current = targets[targets.length - 1];
-        if (isReduced() || y >= maxY - 1) place = targets.indexOf(current);
+        if (reduced || y >= maxY - 1) place = targets.indexOf(current);
         if (mobileLocation.matches) locationTrack.style.setProperty('--place', place.toFixed(3));
         if (trailStops.length) {
           var stop = trailStops[Math.floor(place)];
@@ -4354,27 +4411,20 @@
         return t * t * (3 - 2 * t);
       }
 
-      function updatePostmark() {
-        if (isReduced()) return;
-        var bounds = postmark.getBoundingClientRect();
-        var height = window.innerHeight;
+      function updatePostmark(bounds, height) {
         if (bounds.bottom < 0 || bounds.top > height) return;
         var progress = (height - bounds.top) / (height * .42);
         postmark.style.setProperty('--imprint', easedProgress(progress / .57).toFixed(3));
         postmark.style.setProperty('--cancel-lines', easedProgress((progress - .32) / .68).toFixed(3));
       }
 
-      function updateChapterTransition() {
-        if (isReduced()) return;
-        var bounds = studySection.getBoundingClientRect();
-        var height = window.innerHeight;
+      function updateChapterTransition(bounds, height, headerHeight, margin) {
         if (bounds.top > height || bounds.bottom < 0) return;
 
-        var readingHeight = Math.max(1, height - header.offsetHeight);
+        var readingHeight = Math.max(1, height - headerHeight);
         var entry = easedProgress((height - bounds.top) / readingHeight);
         var exit = easedProgress((height - bounds.bottom) / readingHeight);
         var edge = Math.max(1 - entry, exit);
-        var margin = Math.min(36, window.innerWidth * .035);
         studySection.style.setProperty('--chapter-margin', (margin * edge).toFixed(2) + 'px');
         studySection.style.setProperty('--chapter-corner', (edge * 32).toFixed(2) + 'px');
         studySection.style.setProperty('--contour-offset', (1 - entry).toFixed(4));
