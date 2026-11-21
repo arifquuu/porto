@@ -380,6 +380,7 @@
 
     @media (min-width: 1024px) {
       .nav__links {
+        position: relative;
         margin-left: auto;
         justify-content: flex-end;
         align-items: center;
@@ -388,7 +389,20 @@
       .nav__link[aria-current="page"] {
         color: var(--accent);
       }
+      .nav__links:has(.nav-trail[style]) .nav__link[aria-current="page"]::after { display: none; }
+      .nav-trail { position: absolute; left: 0; height: 2px; border-radius: 2px; background: var(--accent); pointer-events: none; }
     }
+    @media (max-width: 1023px) { .nav-trail { display: none; } }
+    @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) .nav.is-open .nav__links {
+        animation: menu-open 240ms cubic-bezier(.22, 1, .36, 1);
+      }
+      html:not([data-motion="off"]) .nav.is-open .nav__toggle svg {
+        animation: menu-cross 180ms ease-out;
+      }
+    }
+    @keyframes menu-open { from { clip-path: inset(0 0 100%); } to { clip-path: inset(0); } }
+    @keyframes menu-cross { from { transform: rotate(-28deg); } }
 
     @media (max-width: 1023px) {
       .nav__bar {
@@ -679,6 +693,19 @@
 
     .hero__media.is-lit > img {
       transition: transform 140ms cubic-bezier(.22, 1, .36, 1), filter 900ms cubic-bezier(.22, 1, .36, 1);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) .hero__media > img {
+        scale: calc(1 + .09 * var(--portrait-travel, 0));
+      }
+      html:not([data-motion="off"]) .portrait-mat {
+        position: absolute; inset: 0; z-index: 3; pointer-events: none;
+        border: solid var(--p-surface);
+        border-width: calc(var(--portrait-travel, 0) * clamp(12px, 3vw, 36px))
+                      calc(var(--portrait-travel, 0) * clamp(8px, 2vw, 24px));
+        border-radius: inherit;
+      }
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -1735,8 +1762,20 @@
     }
 
     .gh-band--bottom {
-      gap: var(--s-4);
+      position: relative;
+      gap: 28px;
     }
+    .tech-wire { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; color: var(--p-accent); }
+    .tech-wire__guide { opacity: .19; }
+    .tech-wire circle { fill: var(--p-paper-hi); stroke: var(--p-accent); stroke-width: 1.5; }
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="off"]) .tech-wire__ink { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--wire-ink, 1)); }
+      html:not([data-motion="off"]) .tech-wire circle { opacity: var(--wire-ink, 1); }
+      html:not([data-motion="off"]) .tech-wire.is-routing .tech-wire__ink {
+        animation: connect-note 360ms var(--ease);
+      }
+    }
+    @keyframes connect-note { from { stroke-dashoffset: 1; } }
 
     .gh-head {
       align-items: end;
@@ -2710,10 +2749,10 @@
         gap: var(--s-3);
       }
 
-      .gh-band--top,
-      .gh-band--bottom {
+      .gh-band--top {
         gap: var(--s-3);
       }
+      .gh-band--bottom { gap: 22px; }
 
       .gh-head {
         row-gap: var(--s-2);
@@ -3244,6 +3283,7 @@
           </div>
           <div class="hero__media span-6 start-7" id="hero-portrait-frame">
             <img src="assets/images/arifqu-portrait.jpg" width="676" height="892" alt="Potret M. Arifqu Wa Liin mengenakan kemeja batik indigo" fetchpriority="high" decoding="async">
+            <span class="portrait-mat" aria-hidden="true"></span>
           </div>
         </div>
       </div>
@@ -3575,6 +3615,12 @@
         </div>
 
         <div class="gh-band gh-band--bottom">
+          <svg class="tech-wire" aria-hidden="true" focusable="false">
+            <defs><path id="tech-route" pathLength="1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></defs>
+            <use class="tech-wire__guide" href="#tech-route"/>
+            <use class="tech-wire__ink" href="#tech-route"/>
+            <circle r="3" visibility="hidden"/>
+          </svg>
           <ul class="stack-strip" aria-label="Pilih bahasa untuk melihat catatan belajar">
             <li class="stack-strip__item">
               <button class="stack-btn" type="button" id="stack-html" aria-pressed="true" aria-controls="stack-info-html" data-panel-target="stack-info-html">
@@ -3816,7 +3862,7 @@
         if (!el) return;
         cls = cls || 'is-animating';
         el.classList.remove(cls);
-        void el.offsetWidth;
+        el.getBoundingClientRect();
         el.classList.add(cls);
       };
 
@@ -3994,6 +4040,12 @@
         locationTrack.appendChild(name);
       });
       header.querySelector('.nav-location').appendChild(locationTrack);
+      var navTrail = document.createElement('span');
+      navTrail.className = 'nav-trail';
+      navTrail.setAttribute('aria-hidden', 'true');
+      var navigation = header.querySelector('.nav__links');
+      navigation.appendChild(navTrail);
+      var trailStops = [];
 
       var progressLine = header.querySelector('.reading-progress');
       var studySection = document.getElementById('kuliah');
@@ -4007,6 +4059,11 @@
       var proofRange = document.getElementById('proof-reveal');
       var proofFollow = document.getElementById('proof-follow');
       var postmark = document.querySelector('.postmark');
+      var techWire = document.querySelector('.tech-wire');
+      var techRoute = techWire.querySelector('path');
+      var techEnd = techWire.querySelector('circle');
+      var techStrip = document.querySelector('.stack-strip');
+      var wireStartY = 0, wireEndY = 0;
       proofFollow.addEventListener('change', scheduleReadingPosition);
 
       function revealProof(value) {
@@ -4066,6 +4123,19 @@
         pendingScrollFrame = 0;
         var maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
         var y = Math.min(maxY, Math.max(0, window.scrollY));
+        if (!isReduced()) {
+          var portraitBottom = portraitFrame.getBoundingClientRect().bottom;
+          if (portraitBottom > 0) {
+            var travel = easedProgress(y / Math.max(1, portraitBottom + y - header.offsetHeight));
+            portraitFrame.style.setProperty('--portrait-travel', travel.toFixed(4));
+          }
+          var wireTop = techWire.getBoundingClientRect().top;
+          var height = window.innerHeight;
+          if (wireTop + wireEndY >= 0 && wireTop + wireStartY <= height) {
+            var ink = easedProgress((height * .93 - wireTop - wireStartY) / (height * .32 + wireEndY - wireStartY));
+            techWire.style.setProperty('--wire-ink', ink.toFixed(4));
+          }
+        }
         updateChapterTransition();
         updateProof();
         updatePostmark();
@@ -4079,14 +4149,19 @@
         targets.forEach(function (section, index) {
           var distance = readingLine - section.offsetTop;
           if (distance >= 0) current = section;
-          if (index && mobileLocation.matches) {
+          if (index) {
             place += easedProgress(.5 + distance / blendDistance);
           }
         });
         if (y >= maxY - 1 && maxY > 0) current = targets[targets.length - 1];
-        if (mobileLocation.matches) {
-          if (isReduced() || y >= maxY - 1) place = targets.indexOf(current);
-          locationTrack.style.setProperty('--place', place.toFixed(3));
+        if (isReduced() || y >= maxY - 1) place = targets.indexOf(current);
+        if (mobileLocation.matches) locationTrack.style.setProperty('--place', place.toFixed(3));
+        if (trailStops.length) {
+          var stop = trailStops[Math.floor(place)];
+          var next = trailStops[Math.ceil(place)];
+          var fraction = place % 1;
+          navTrail.style.transform = 'translateX(' + (stop.left + (next.left - stop.left) * fraction) + 'px)';
+          navTrail.style.width = (stop.width + (next.width - stop.width) * fraction) + 'px';
         }
         if (current === activeSection) return;
         activeSection = current;
@@ -4099,9 +4174,51 @@
       function scheduleReadingPosition() {
         if (!pendingScrollFrame) pendingScrollFrame = requestAnimationFrame(updateReadingPosition);
       }
+      function measureMotionLayout() {
+        trailStops = [];
+        if (window.matchMedia('(min-width: 1024px)').matches) {
+          var navBounds = navigation.getBoundingClientRect();
+          trailStops = links.map(function (link) {
+            var box = link.getBoundingClientRect();
+            var padding = parseFloat(getComputedStyle(link).paddingLeft);
+            return { left: box.left - navBounds.left + padding, width: box.width - 2 * padding };
+          });
+          navTrail.style.top = (links[0].getBoundingClientRect().bottom - navBounds.top) + 'px';
+        }
+        var bounds = techWire.getBoundingClientRect();
+        var selected = techStrip.querySelector('[aria-pressed="true"]').getBoundingClientRect();
+        var strip = techStrip.getBoundingClientRect();
+        var reader = stackReaderFx.getBoundingClientRect();
+        var middle = bounds.width / 2;
+        var endX = parseFloat(getComputedStyle(stackReaderFx).paddingLeft) + 1;
+        wireEndY = reader.top - bounds.top;
+        var laneY = (strip.bottom + reader.top) / 2 - bounds.top;
+        var x = selected.left + selected.width / 2 - bounds.left;
+        wireStartY = selected.bottom - bounds.top;
+        var route = 'M ' + x + ' ' + wireStartY;
+        if (strip.bottom - selected.bottom > 4) {
+          // The upper pair on phones shares the vertical gutter between the lower cards.
+          wireStartY = selected.top + selected.height / 2 - bounds.top;
+          var edge = (x < middle ? selected.right : selected.left) - bounds.left;
+          route = 'M ' + edge + ' ' + wireStartY + ' Q ' + middle + ' ' + wireStartY + ' ' + middle + ' ' + (wireStartY + 6)
+            + ' V ' + (laneY - 5);
+          x = middle;
+        }
+        route += ' C ' + x + ' ' + laneY + ' ' + endX + ' ' + laneY + ' ' + endX + ' ' + wireEndY;
+        techRoute.setAttribute('d', route);
+        techEnd.setAttribute('cx', endX);
+        techEnd.setAttribute('cy', wireEndY);
+        techEnd.removeAttribute('visibility');
+        scheduleReadingPosition();
+      }
       window.addEventListener('scroll', scheduleReadingPosition, { passive: true });
-      window.addEventListener('resize', scheduleReadingPosition);
-      if ('ResizeObserver' in window) new ResizeObserver(scheduleReadingPosition).observe(document.body);
+      window.addEventListener('resize', measureMotionLayout);
+      if ('ResizeObserver' in window) {
+        var layoutObserver = new ResizeObserver(measureMotionLayout);
+        [document.body, navigation, techStrip, stackReaderFx].forEach(function (node) { layoutObserver.observe(node); });
+      }
+      document.fonts?.ready.then(measureMotionLayout);
+      measureMotionLayout();
       updateReadingPosition();
 
       function easedProgress(value) {
@@ -4218,7 +4335,10 @@
         if (trackId === 'api') traceApiNodes();
       }, true);
 
-      bindPanelGroup('.stack-btn[data-panel-target]');
+      bindPanelGroup('.stack-btn[data-panel-target]', function () {
+        measureMotionLayout();
+        if (!isReduced()) pulseAnim(techWire, 'is-routing');
+      });
 
       function showLinkedPanel(hash) {
         var target = document.getElementById(hash.slice(1));
